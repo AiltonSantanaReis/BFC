@@ -12,3 +12,4 @@ EditorBuildSettings:
     path: Assets/BFC/Scenes/PhysicsLab.unity
     guid: e39e8a5060a248f9966a3e2c47618739
   m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0

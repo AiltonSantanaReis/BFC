@@ -1,0 +1,13 @@
+{
+  "name": "BFC.FormationLab",
+  "rootNamespace": "BFC.FormationLab",
+  "references": [
+    "BFC.Core",
+    "BFC.Physics"
+  ],
+  "autoReferenced": false,
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "noEngineReferences": false
+}

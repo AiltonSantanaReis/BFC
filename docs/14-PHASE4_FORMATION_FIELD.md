@@ -1,6 +1,6 @@
 # BFC Phase 4 — Formation & Field
 
-Status: **ACTIVE — OPEN-001 RESOLVED / FIRST DOMAIN SLICE IMPLEMENTED**
+Status: **ACTIVE — DOMAIN SLICE VALIDATED / RUNTIME MATERIALIZATION IMPLEMENTED, UNITY VALIDATION PENDING**
 
 ## Objetivo
 
@@ -24,7 +24,7 @@ Registros:
 - `docs/decisions/ADR-0003-mode-specific-formation-profiles.md`;
 - `OPEN-001` está `locked` no registro de governança.
 
-## Primeira fatia implementada
+## Primeira fatia — domínio validado
 
 ### Composição de equipe
 
@@ -57,27 +57,48 @@ As dimensões finais de produção continuam sendo dados de conteúdo/tuning; es
 
 `FormationSpawnPlanner` converte slots normalizados em coordenadas XZ respeitando margem de segurança e espelha longitudinalmente a mesma formação para Team A e Team B.
 
-Isso permite usar a mesma infraestrutura em campo grande, modos derivados do legado e cenários de Treino/Desafios.
+A primeira fatia foi validada no Unity 6000.3.21f1 com EditMode 21/21, PlayMode 1/1, metadados Unity revisados e CI de Governance/Unity Structure verde antes do merge.
+
+## Segunda fatia — materialização de runtime
+
+Foi criado um harness dedicado `FormationLab` que consome as definições de domínio em vez de duplicar contagem e posicionamento na cena.
+
+A materialização atual cria em runtime:
+
+- superfície de campo configurável;
+- marcações principais e áreas de gol;
+- duas estruturas de gol e volumes de gol;
+- Team A e Team B a partir de `FormationSpawnPlanner`;
+- 11 peças por equipe no perfil Campo Grande, totalizando 22 peças;
+- 10 peças de linha + 1 goleiro por equipe, com papel explícito em `FormationPieceRuntime`;
+- bola com `PlanarKineticBody`;
+- peças com root sem escala e visual cilíndrico como filho, evitando repetir o problema de collider sob escala não uniforme do laboratório inicial.
+
+`FormationLabPreviewProfiles` fornece um campo e uma formação balanceada apenas para visualização e testes da Fase 4. As dimensões `28 x 18` e o layout usado no preview são **não normativos** e não congelam tamanho oficial nem uma formação tática obrigatória.
+
+A cena `Assets/BFC/Scenes/FormationLab.unity` permanece como laboratório de desenvolvimento e fica desabilitada no build settings; o `Bootstrap` continua sendo a única cena de entrada habilitada.
 
 ## Restrições de arquitetura
 
 - nenhum número de peças pode ficar hardcoded em lógica central de partida;
-- o número 11 existe somente na definição do perfil campo grande;
+- o número 11 existe somente na definição do perfil campo grande e em expectativas explícitas de teste desse perfil;
 - `BFC.Core` continua independente de `UnityEngine`;
 - física não decide formação nem regras de posse;
 - goleiro é papel de domínio, não inferência por nome de GameObject;
 - conteúdo de formação/campo é configurável por definição/ruleset;
+- o FormationLab é um adapter/harness Unity e não fonte normativa de regras;
 - `OPEN-002` e `OPEN-003` permanecem fora do escopo desta fase.
 
 ## Decisões ainda não congeladas
 
-A resolução de `OPEN-001` não escolhe silenciosamente:
+A resolução de `OPEN-001` e o preview de runtime não escolhem silenciosamente:
 
 - dimensão final do campo grande;
 - formação tática única obrigatória (4-4-2, 4-3-3 etc.);
 - quantidade exata dos perfis derivados do legado quando sua definição específica ainda não tiver sido materializada;
 - regras de saída/reposição;
-- faltas/pênaltis.
+- faltas/pênaltis;
+- tuning físico final das peças, bola, goleiro ou campo.
 
 ## Gate da Fase 4
 
@@ -88,14 +109,17 @@ A resolução de `OPEN-001` não escolhe silenciosamente:
 - [x] goleiro identificado como função distinta;
 - [x] definição lógica configurável de campo;
 - [x] planejamento de spawn espelhado e com margem segura;
-- [ ] Unity 6000.3.21f1 importa/compila a nova fatia;
-- [ ] novos testes EditMode passam;
-- [ ] testes existentes permanecem verdes;
-- [ ] `.meta` gerados pelo Unity revisados e commitados;
-- [ ] integração visual/física materializada em um campo de runtime;
-- [ ] performance estável no target Windows;
+- [x] primeira fatia validada no Unity 6000.3.21f1;
+- [x] integração visual/física implementada em `FormationLab`;
+- [x] PlayMode smoke test para 22 peças, 2 goleiros e 1 bola implementado;
+- [ ] Unity 6000.3.21f1 importa/compila a segunda fatia sem erros;
+- [ ] EditMode existente permanece 21/21 ou melhor;
+- [ ] PlayMode inclui e aprova o novo smoke test;
+- [ ] novos `.meta` gerados pelo Unity são revisados e commitados;
+- [ ] inspeção manual do FormationLab confirma campo, 22 peças, 2 goleiros, bola e gols visíveis;
+- [ ] performance do preview não apresenta regressão evidente no target Windows;
 - [ ] CI Governance e Unity Structure verdes no head final.
 
-## Próxima fatia
+## Próxima decisão após esta fatia
 
-Depois da validação desta camada de domínio, materializar um `FieldLab`/harness de runtime que consuma `FieldDefinition` e `FormationDefinition`, criando peças e goleiro sem duplicar contagem/posicionamento na cena.
+Depois de validar o FormationLab, a Fase 4 pode avançar para perfis adicionais de campo/formação e integração gradual com fluxo de partida. O `BFC Classic Simulation` permanece registrado separadamente para especificação do modelo de golpe antes/durante a Fase 5, sem interromper esta fundação.

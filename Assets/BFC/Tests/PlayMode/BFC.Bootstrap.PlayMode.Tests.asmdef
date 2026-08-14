@@ -2,7 +2,10 @@
   "name": "BFC.Bootstrap.PlayMode.Tests",
   "rootNamespace": "BFC.Tests.PlayMode",
   "references": [
-    "BFC.Bootstrap"
+    "BFC.Bootstrap",
+    "BFC.Core",
+    "BFC.FormationLab",
+    "BFC.Physics"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
