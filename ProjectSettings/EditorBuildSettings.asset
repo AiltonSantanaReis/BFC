@@ -11,7 +11,5 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/BFC/Scenes/PhysicsLab.unity
     guid: e39e8a5060a248f9966a3e2c47618739
-  - enabled: 0
-    path: Assets/BFC/Scenes/FormationLab.unity
-    guid: 4c0b1e29c3a746bda5f4910ef3217c88
   m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0
