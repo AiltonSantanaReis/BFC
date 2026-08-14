@@ -89,7 +89,7 @@ foreach ($platform in $testPlatforms) {
         throw "Unity $name tests did not pass: result=$result total=$total passed=$passed failed=$failed. See $resultFile and $logFile"
     }
 
-    Write-Host "BFC Unity $name: PASS (total=$total, passed=$passed, failed=$failed)."
+    Write-Host "BFC Unity ${name}: PASS (total=$total, passed=$passed, failed=$failed)."
 }
 
 Write-Host "BFC Unity EditMode and PlayMode tests completed successfully with verified XML results."
