@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 1,
+  "product": "BFC",
+  "owner": "AiltonSantanaReis",
+  "rules": [
+    {
+      "id": "P-001",
+      "category": "product",
+      "status": "locked",
+      "title": "Official product name",
+      "statement": "The official product name is BFC.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "P-002",
+      "category": "visual",
+      "status": "locked",
+      "title": "Official visual reference",
+      "statement": "Interface e Menu is the official visual reference and its layout, colors, composition and style must be preserved unless a visual change is explicitly approved.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "P-004",
+      "category": "economy",
+      "status": "locked",
+      "title": "No competitive pay-to-win",
+      "statement": "Purchases and cosmetics cannot grant gameplay-stat advantages in the official competitive ruleset.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "GAME-001",
+      "category": "gameplay",
+      "status": "locked",
+      "title": "Digital button football",
+      "statement": "BFC remains a digital button-football game based on discrete aimed physical actions rather than continuous character control.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "GAME-002",
+      "category": "input",
+      "status": "locked",
+      "title": "Aim, power and release interaction",
+      "statement": "The primary action preserves selection, direction, power feedback and release; device-specific mappings may differ.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "GAME-003",
+      "category": "turns",
+      "status": "locked",
+      "title": "Resolve physics before next tactical action",
+      "statement": "A new competitive tactical action cannot begin while the previous physical state is still unresolved.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "GAME-004",
+      "category": "turns",
+      "status": "locked",
+      "title": "Competitive actions per possession",
+      "statement": "Official competitive modes preserve the concept of up to three consecutive actions per possession, subject to explicit possession-loss rules.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "GAME-005",
+      "category": "modes",
+      "status": "locked",
+      "title": "Essential local modes",
+      "statement": "BFC supports P1 vs COM and P1 vs P2 as essential local play modes.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "GAME-010",
+      "category": "actions",
+      "status": "locked",
+      "title": "Shot action",
+      "statement": "Shot is the normal-power direct piece action controlled by player aim and power.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "GAME-011",
+      "category": "actions",
+      "status": "locked-tunable",
+      "title": "Pass action",
+      "statement": "Pass is intentionally more controlled and has reduced maximum power relative to a normal shot; the exact coefficient is tunable.",
+      "changeAuthority": "product-owner-for-concept"
+    },
+    {
+      "id": "GAME-012",
+      "category": "actions",
+      "status": "locked-tunable",
+      "title": "Spin action",
+      "statement": "BFC supports player-intended spin/curve with tunable strength and control mapping.",
+      "changeAuthority": "product-owner-for-concept"
+    },
+    {
+      "id": "GAME-013",
+      "category": "actions",
+      "status": "locked-tunable",
+      "title": "Chip or airborne action",
+      "statement": "BFC preserves an action that lifts the ball over eligible obstacles; trajectory parameters are tunable.",
+      "changeAuthority": "product-owner-for-concept"
+    },
+    {
+      "id": "GAME-014",
+      "category": "input-ui",
+      "status": "locked",
+      "title": "Contextual action access",
+      "statement": "Special actions remain available through a clear contextual/radial interaction concept across supported input devices.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "GAME-020",
+      "category": "goalkeeper",
+      "status": "locked",
+      "title": "Automatic competitive goalkeeper",
+      "statement": "The goalkeeper is automatic in official competitive rulesets that adopt the legacy competitive behavior.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "GAME-030",
+      "category": "physics",
+      "status": "locked-tunable",
+      "title": "Meaningful physical properties",
+      "statement": "Mass, restitution, friction and related physical properties remain meaningful while their numeric values are tunable and must never create invalid infinite acceleration or deadlock.",
+      "changeAuthority": "product-owner-for-concept"
+    },
+    {
+      "id": "GAME-031",
+      "category": "physics",
+      "status": "locked",
+      "title": "Frame-rate independent gameplay",
+      "statement": "Gameplay physics must not depend on render refresh rate; equivalent initial states and inputs must remain equivalent within defined tolerances.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "GAME-032",
+      "category": "competitive",
+      "status": "locked",
+      "title": "Competitive parity",
+      "statement": "Official competitive rulesets standardize or normalize gameplay-affecting field, ball and piece attributes.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "GAME-040",
+      "category": "ai",
+      "status": "locked",
+      "title": "Functional P1 vs COM AI",
+      "statement": "P1 vs COM uses AI that selects valid pieces and executes valid actions through the same gameplay rule validation as a player.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "GAME-050",
+      "category": "competitive",
+      "status": "locked",
+      "title": "Liga Justa identity",
+      "statement": "Liga Justa remains an official standardized competitive mode with no pay-to-win gameplay advantage.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "GAME-051",
+      "category": "competitive",
+      "status": "locked",
+      "title": "Campeonato identity",
+      "statement": "Campeonato remains a competitive mode distinct from Liga Justa with its own progression or tournament structure.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "GAME-052",
+      "category": "progression",
+      "status": "locked",
+      "title": "Progress on valid defeat",
+      "statement": "A valid defeat may still award progression or reward; losing does not automatically zero all session progression.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "GAME-060",
+      "category": "progression",
+      "status": "locked",
+      "title": "Persistent profile",
+      "statement": "Relevant profile, settings and progression persist across sessions through versioned save data.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "GAME-062",
+      "category": "progression",
+      "status": "locked",
+      "title": "Trophy showcase",
+      "statement": "Earned achievements or trophies can feed the player's visual showcase/profile.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "GAME-063",
+      "category": "economy",
+      "status": "locked",
+      "title": "Explicit shop ownership states",
+      "statement": "Shop items clearly distinguish locked, acquirable, owned and equipped/selected states.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "OPEN-001",
+      "category": "formation",
+      "status": "open",
+      "title": "Official team piece count",
+      "statement": "The final number of pieces per team and whether goalkeeper is included in that count requires explicit Product Owner decision before the full-formation milestone.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "OPEN-002",
+      "category": "rules",
+      "status": "open",
+      "title": "Out-of-bounds and restarts",
+      "statement": "Final rules for out-of-bounds, possession transfer and restarts require explicit approval before implementation becomes normative.",
+      "changeAuthority": "product-owner"
+    },
+    {
+      "id": "OPEN-003",
+      "category": "rules",
+      "status": "open",
+      "title": "Fouls, advantage and penalties",
+      "statement": "Exact foul, advantage and penalty rules require explicit Product Owner specification before becoming normative.",
+      "changeAuthority": "product-owner"
+    }
+  ]
+}
