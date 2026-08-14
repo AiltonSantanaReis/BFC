@@ -127,7 +127,11 @@ namespace BFC.Physics
             body.mass = bodyMass;
             body.useGravity = false;
             body.interpolation = RigidbodyInterpolation.Interpolate;
-            body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+
+            // Phase 2 starts from the least invasive PhysX mode. CCD is enabled only
+            // after the laboratory proves that tunnelling actually requires it.
+            body.collisionDetectionMode = CollisionDetectionMode.Discrete;
+
             body.constraints =
                 RigidbodyConstraints.FreezePositionY |
                 RigidbodyConstraints.FreezeRotationX |
