@@ -1,0 +1,13 @@
+{
+  "name": "BFC.PhysicsLab",
+  "rootNamespace": "BFC.PhysicsLab",
+  "references": [
+    "BFC.Physics",
+    "Unity.InputSystem"
+  ],
+  "autoReferenced": false,
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "noEngineReferences": false
+}
