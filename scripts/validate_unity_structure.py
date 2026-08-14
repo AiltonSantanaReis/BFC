@@ -23,6 +23,8 @@ def main() -> None:
     required_paths = [
         "Assets/BFC/Scenes/Bootstrap.unity",
         "Assets/BFC/Scenes/PhysicsLab.unity",
+        "Assets/BFC/Scenes/FormationLab.unity",
+        "Assets/BFC/Scenes/FormationLab.unity.meta",
         "Assets/BFC/Editor/ProjectSetup/BfcProjectSetup.cs",
         "Assets/BFC/Editor/Build/BfcBuild.cs",
         "Assets/BFC/Physics/PlanarMotionMath.cs",
@@ -31,6 +33,11 @@ def main() -> None:
         "Assets/BFC/Physics/PlanarKineticBody.cs",
         "Assets/BFC/PhysicsLab/BFC.PhysicsLab.asmdef",
         "Assets/BFC/PhysicsLab/PhysicsLabRuntimeBootstrap.cs",
+        "Assets/BFC/FormationLab/BFC.FormationLab.asmdef",
+        "Assets/BFC/FormationLab/FormationLabPreviewProfiles.cs",
+        "Assets/BFC/FormationLab/FormationPieceRuntime.cs",
+        "Assets/BFC/FormationLab/FormationLabRuntimeBuilder.cs",
+        "Assets/BFC/FormationLab/FormationLabRuntimeBootstrap.cs",
         "Assets/BFC/Gameplay/Matches/MatchPhase.cs",
         "Assets/BFC/Gameplay/Matches/MatchFinishReason.cs",
         "Assets/BFC/Gameplay/Matches/MatchScore.cs",
@@ -50,6 +57,7 @@ def main() -> None:
         "Assets/BFC/Tests/EditMode/BFC.Core.EditMode.Tests.asmdef",
         "Assets/BFC/Tests/EditMode/FormationFieldTests.cs",
         "Assets/BFC/Tests/PlayMode/BFC.Bootstrap.PlayMode.Tests.asmdef",
+        "Assets/BFC/Tests/PlayMode/FormationLabSmokeTests.cs",
         "Assets/BFC/Tests/PhysicsEditMode/BFC.Physics.EditMode.Tests.asmdef",
         "Assets/BFC/Tests/PhysicsEditMode/PhysicsBenchmarkTests.cs",
         "Assets/BFC/Tests/GameplayEditMode/BFC.Gameplay.EditMode.Tests.asmdef",
@@ -69,7 +77,7 @@ def main() -> None:
     for asmdef in (ROOT / "Assets/BFC").rglob("*.asmdef"):
         json.loads(asmdef.read_text(encoding="utf-8"))
 
-    for scene_name in ("Bootstrap.unity", "PhysicsLab.unity"):
+    for scene_name in ("Bootstrap.unity", "PhysicsLab.unity", "FormationLab.unity"):
         scene = (ROOT / "Assets/BFC/Scenes" / scene_name).read_text(encoding="utf-8")
         require(scene.startswith("%YAML 1.1"), f"{scene_name} is not a Unity text scene")
         require("SceneRoots:" in scene, f"{scene_name} has no SceneRoots block")
@@ -80,9 +88,14 @@ def main() -> None:
     physics_lab_scene = (ROOT / "Assets/BFC/Scenes/PhysicsLab.unity").read_text(encoding="utf-8")
     require("c7a6e6315b7a4f02a12d914b8c5e60f1" in physics_lab_scene, "PhysicsLab scene lost runtime bootstrap reference")
 
+    formation_scene_meta = (ROOT / "Assets/BFC/Scenes/FormationLab.unity.meta").read_text(encoding="utf-8")
+    require("guid: 4c0b1e29c3a746bda5f4910ef3217c88" in formation_scene_meta, "FormationLab scene GUID changed")
+
     build_settings = (ROOT / "ProjectSettings/EditorBuildSettings.asset").read_text(encoding="utf-8")
     require("Assets/BFC/Scenes/Bootstrap.unity" in build_settings, "Bootstrap scene missing from build settings")
     require("Assets/BFC/Scenes/PhysicsLab.unity" in build_settings, "PhysicsLab scene missing from build settings")
+    require("Assets/BFC/Scenes/FormationLab.unity" in build_settings, "FormationLab scene missing from build settings")
+    require("4c0b1e29c3a746bda5f4910ef3217c88" in build_settings, "FormationLab build-settings GUID mismatch")
 
     build_script = (ROOT / "Assets/BFC/Editor/Build/BfcBuild.cs").read_text(encoding="utf-8")
     require("BuildTarget.StandaloneWindows64" in build_script, "Windows x64 build target missing")
@@ -98,6 +111,12 @@ def main() -> None:
     require("BFC.Physics" in lab_refs, "PhysicsLab must reference BFC.Physics")
     require("Unity.InputSystem" in lab_refs, "PhysicsLab must reference the Input System")
 
+    formation_lab_asmdef = json.loads((ROOT / "Assets/BFC/FormationLab/BFC.FormationLab.asmdef").read_text(encoding="utf-8"))
+    formation_lab_refs = formation_lab_asmdef.get("references", [])
+    require("BFC.Core" in formation_lab_refs, "FormationLab must reference BFC.Core")
+    require("BFC.Physics" in formation_lab_refs, "FormationLab must reference BFC.Physics")
+    require("Unity.InputSystem" not in formation_lab_refs, "FormationLab runtime materialization must not require input")
+
     gameplay_asmdef = json.loads((ROOT / "Assets/BFC/Gameplay/BFC.Gameplay.asmdef").read_text(encoding="utf-8"))
     gameplay_refs = gameplay_asmdef.get("references", [])
     require("BFC.Core" in gameplay_refs, "BFC.Gameplay must reference BFC.Core")
@@ -110,6 +129,13 @@ def main() -> None:
     gameplay_test_refs = gameplay_tests.get("references", [])
     require("BFC.Core" in gameplay_test_refs, "Gameplay EditMode tests must reference BFC.Core")
     require("BFC.Gameplay" in gameplay_test_refs, "Gameplay EditMode tests must reference BFC.Gameplay")
+
+    playmode_tests = json.loads(
+        (ROOT / "Assets/BFC/Tests/PlayMode/BFC.Bootstrap.PlayMode.Tests.asmdef").read_text(encoding="utf-8")
+    )
+    playmode_refs = playmode_tests.get("references", [])
+    require("BFC.FormationLab" in playmode_refs, "PlayMode tests must reference BFC.FormationLab")
+    require("BFC.Physics" in playmode_refs, "PlayMode tests must reference BFC.Physics for runtime smoke assertions")
 
     match_controller = (ROOT / "Assets/BFC/Gameplay/Matches/MatchController.cs").read_text(encoding="utf-8")
     require("MaxActionsPerPossession" in match_controller, "Match Core must source the possession action limit from rules")
@@ -134,12 +160,21 @@ def main() -> None:
     require("LargeFieldEleven" in composition_source, "Large-field eleven profile is missing")
     require("totalPieces: 11, goalkeeperCount: 1" in composition_source, "Large-field profile must remain 11 total including one goalkeeper")
 
+    preview_source = (ROOT / "Assets/BFC/FormationLab/FormationLabPreviewProfiles.cs").read_text(encoding="utf-8")
+    require("TeamCompositionDefinition.LargeFieldEleven" in preview_source, "FormationLab must materialize the approved large-field composition")
+    require("not normative" in preview_source, "FormationLab preview tuning must remain explicitly non-normative")
+
+    builder_source = (ROOT / "Assets/BFC/FormationLab/FormationLabRuntimeBuilder.cs").read_text(encoding="utf-8")
+    require("FormationSpawnPlanner.CreateSpawns" in builder_source, "FormationLab must use domain spawn planning")
+    require("FormationPieceRuntime" in builder_source, "FormationLab pieces must carry explicit runtime identity")
+    require("Goal Volume" in builder_source, "FormationLab must materialize goal volumes")
+
     rules = json.loads((ROOT / "governance/rules.json").read_text(encoding="utf-8"))["rules"]
     open_001 = next((rule for rule in rules if rule.get("id") == "OPEN-001"), None)
     require(open_001 is not None, "OPEN-001 governance record is missing")
     require(open_001.get("status") == "locked", "OPEN-001 must remain resolved/locked for Phase 4")
 
-    print("Unity Phase 4 structure validation passed.")
+    print("Unity Phase 4 runtime structure validation passed.")
 
 
 if __name__ == "__main__":
