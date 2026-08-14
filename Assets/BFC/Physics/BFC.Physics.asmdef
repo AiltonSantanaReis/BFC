@@ -1,0 +1,10 @@
+{
+  "name": "BFC.Physics",
+  "rootNamespace": "BFC.Physics",
+  "references": ["BFC.Core"],
+  "autoReferenced": false,
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "noEngineReferences": false
+}
