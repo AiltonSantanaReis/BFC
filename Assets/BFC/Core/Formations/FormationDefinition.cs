@@ -41,6 +41,13 @@ namespace BFC.Core.Formations
             for (int index = 0; index < slots.Count; index++)
             {
                 FormationSlot slot = slots[index];
+                if (string.IsNullOrWhiteSpace(slot.Id))
+                {
+                    throw new ArgumentException(
+                        "Formation slots must have a valid id.",
+                        nameof(slots));
+                }
+
                 if (!ids.Add(slot.Id))
                 {
                     throw new ArgumentException(
