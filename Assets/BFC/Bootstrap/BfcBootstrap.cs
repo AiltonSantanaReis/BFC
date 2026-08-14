@@ -4,14 +4,31 @@ namespace BFC.Bootstrap
 {
     /// <summary>
     /// Composition root for runtime dependencies.
-    /// Keep service construction here rather than introducing global mutable singletons.
+    /// Service construction belongs here; gameplay systems must not become global singletons.
     /// </summary>
     public sealed class BfcBootstrap : MonoBehaviour
     {
+        private static BfcBootstrap instance;
+
         private void Awake()
         {
-            // Foundation only. Runtime services will be composed here as milestones land.
+            if (instance != null && instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            instance = this;
+            DontDestroyOnLoad(gameObject);
             Debug.Log("[BFC] Bootstrap initialized.");
+        }
+
+        private void OnDestroy()
+        {
+            if (instance == this)
+            {
+                instance = null;
+            }
         }
     }
 }
