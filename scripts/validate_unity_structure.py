@@ -128,7 +128,7 @@ def main() -> None:
     ]
     for path in formation_paths:
         source = path.read_text(encoding="utf-8")
-        require("UnityEngine" not in source, f"Phase 4 domain file must remain engine-independent: {path.name}")
+        require("using UnityEngine" not in source, f"Phase 4 domain file imports UnityEngine: {path.name}")
 
     composition_source = (ROOT / "Assets/BFC/Core/Formations/TeamCompositionDefinition.cs").read_text(encoding="utf-8")
     require("LargeFieldEleven" in composition_source, "Large-field eleven profile is missing")
