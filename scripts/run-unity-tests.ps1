@@ -14,6 +14,20 @@ if (-not (Test-Path $UnityPath)) {
 New-Item -ItemType Directory -Force -Path $ResultsDirectory | Out-Null
 New-Item -ItemType Directory -Force -Path $LogDirectory | Out-Null
 
+function Invoke-UnityAndWait {
+    param(
+        [string[]]$Arguments
+    )
+
+    $process = Start-Process `
+        -FilePath $UnityPath `
+        -ArgumentList $Arguments `
+        -Wait `
+        -PassThru
+
+    return $process.ExitCode
+}
+
 $testPlatforms = @(
     @{ Name = "EditMode"; CliValue = "editmode" },
     @{ Name = "PlayMode"; CliValue = "playmode" }
@@ -30,16 +44,18 @@ foreach ($platform in $testPlatforms) {
 
     Write-Host "Running BFC Unity $name tests..."
 
-    & $UnityPath `
-        -batchmode `
-        -nographics `
-        -projectPath $ProjectRoot `
-        -runTests `
-        -testPlatform $cliValue `
-        -testResults $resultFile `
-        -logFile $logFile
+    $arguments = @(
+        "-batchmode",
+        "-nographics",
+        "-projectPath", "`"$ProjectRoot`"",
+        "-runTests",
+        "-testPlatform", $cliValue,
+        "-testResults", "`"$resultFile`"",
+        "-logFile", "`"$logFile`""
+    )
 
-    $exitCode = $LASTEXITCODE
+    $exitCode = Invoke-UnityAndWait -Arguments $arguments
+
     if ($exitCode -ne 0) {
         throw "Unity $name tests failed with exit code $exitCode. See $logFile"
     }
