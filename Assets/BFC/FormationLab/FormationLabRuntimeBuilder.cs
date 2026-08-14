@@ -103,7 +103,6 @@ namespace BFC.FormationLab
             GameObject cameraObject = new GameObject("Main Camera");
             cameraObject.tag = "MainCamera";
             camera = cameraObject.AddComponent<Camera>();
-            cameraObject.AddComponent<AudioListener>();
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = new Color(0.003f, 0.007f, 0.018f);
             return camera;
@@ -270,7 +269,7 @@ namespace BFC.FormationLab
             Material visualMaterial,
             PhysicsMaterial collisionMaterial)
         {
-            GameObject root = new GameObject($"{team} {spawn.SlotId}");
+            GameObject root = new GameObject($"{team} {spawn.PieceId}");
             root.transform.SetParent(parent, false);
             root.transform.position = new Vector3(spawn.X, PhysicsLabTuning.PieceHeight * 0.5f, spawn.Z);
 
@@ -287,7 +286,7 @@ namespace BFC.FormationLab
                 PhysicsLabTuning.RestSpeed);
 
             FormationPieceRuntime identity = root.AddComponent<FormationPieceRuntime>();
-            identity.Initialize(team, spawn.SlotId, spawn.Role);
+            identity.Initialize(team, spawn.PieceId, spawn.Role);
 
             GameObject visual = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             visual.name = "Visual";
