@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace BFC.Core.Formations
 {
@@ -8,7 +9,7 @@ namespace BFC.Core.Formations
     /// </summary>
     public sealed class FormationDefinition
     {
-        private readonly FormationSlot[] _slots;
+        private readonly ReadOnlyCollection<FormationSlot> _slots;
 
         public FormationDefinition(
             string id,
@@ -33,7 +34,7 @@ namespace BFC.Core.Formations
                     nameof(slots));
             }
 
-            _slots = new FormationSlot[slots.Count];
+            var copy = new FormationSlot[slots.Count];
             var ids = new HashSet<string>(StringComparer.Ordinal);
             int goalkeeperCount = 0;
 
@@ -52,7 +53,7 @@ namespace BFC.Core.Formations
                     goalkeeperCount++;
                 }
 
-                _slots[index] = slot;
+                copy[index] = slot;
             }
 
             if (goalkeeperCount != composition.GoalkeeperCount)
@@ -63,6 +64,7 @@ namespace BFC.Core.Formations
             }
 
             Id = id;
+            _slots = Array.AsReadOnly(copy);
         }
 
         public string Id { get; }
