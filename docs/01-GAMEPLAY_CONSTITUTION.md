@@ -165,15 +165,21 @@ A loja deve distinguir claramente:
 - possuído;
 - equipado/selecionado.
 
-## 9. Regras de saída, faltas e formação
+## 9. Formação, saída e faltas
 
-Os pontos abaixo são deliberadamente **OPEN** porque a história dos protótipos contém intenções diferentes e não devem ser resolvidos por suposição.
+### OPEN-001 — Composição por modo e campo grande 11 peças — RESOLVED / LOCKED
 
-### OPEN-001 — Quantidade oficial de peças por equipe
+BFC não possui uma única contagem global de peças para todos os modos.
 
-O BFC legado implementa formação reduzida. A visão de produto posterior aponta para campo maior e formação ampliada. A contagem final deve ser aprovada antes do milestone de formação completa.
+- modos derivados do baseline legado preservam seus padrões de campo e composição por definição/ruleset;
+- o perfil oficial de **campo grande** possui **11 peças no total por equipe: 10 jogadores de linha + 1 goleiro**;
+- o goleiro está incluído na contagem de 11, não é uma peça adicional;
+- Treino e Desafios podem definir campos, quantidades de peças e formações próprias conforme o cenário;
+- lógica central não pode codificar uma quantidade fixa de peças fora da definição/ruleset.
 
-Arquitetura deve suportar quantidade configurável por ruleset e não codificar um número fixo em lógica central.
+A decisão está detalhada em `RFC-0001` e `ADR-0003`.
+
+Os pontos abaixo continuam deliberadamente **OPEN** e não devem ser resolvidos por suposição.
 
 ### OPEN-002 — Bola fora / reposições
 

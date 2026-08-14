@@ -6,23 +6,26 @@ Quando resolvida, a decisão deve gerar ADR/RFC/regra conforme o impacto e mover
 
 ## OPEN-001 — Quantidade oficial de peças por equipe
 
-**Status:** OPEN
+**Status:** RESOLVED — 2026-08-14
 
-Contexto:
+Decisão aprovada:
 
-- o BFC legado usa formação reduzida;
-- a visão posterior do produto aponta para campo maior e formação ampliada;
-- a arquitetura deve suportar quantidade configurável.
+- não existe uma contagem global única de peças para todos os modos do BFC;
+- modos derivados do baseline legado preservam seus padrões de campo/composição por configuração própria;
+- o perfil oficial de **campo grande** usa **11 peças no total por equipe**;
+- essas 11 peças são **10 jogadores de linha + 1 goleiro**, com o goleiro incluído na contagem;
+- Treino e Desafios podem definir campo, quantidade de peças e formação conforme cada cenário;
+- contagem e formação devem permanecer configuráveis por modo/ruleset, sem número mágico em lógica central.
 
-Decisão necessária:
+Registro normativo:
 
-- quantidade total oficial por equipe;
-- se o goleiro está incluído nessa contagem ou é adicional;
-- formações alternativas permitidas por treino/desafio.
+- `OPEN-001` agora está `locked` em `governance/rules.json` com a decisão aprovada;
+- `docs/changes/RFC-0001-phase4-team-composition.md`;
+- `docs/decisions/ADR-0003-mode-specific-formation-profiles.md`.
 
-Bloqueia:
+Não bloqueia mais:
 
-- Fase 4 — Formation & Field como regra definitiva.
+- Fase 4 — Formation & Field.
 
 ## OPEN-002 — Bola fora e reposições
 

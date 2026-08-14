@@ -198,9 +198,9 @@
     {
       "id": "OPEN-001",
       "category": "formation",
-      "status": "open",
-      "title": "Official team piece count",
-      "statement": "The final number of pieces per team and whether goalkeeper is included in that count requires explicit Product Owner decision before the full-formation milestone.",
+      "status": "locked",
+      "title": "Mode-specific team composition and large-field eleven",
+      "statement": "Team composition and field formation are mode/ruleset data. The large-field profile uses 11 total pieces per team: 10 outfield pieces plus 1 goalkeeper included in the total. Legacy-derived modes preserve their reference compositions through configuration, and Training/Challenges may define scenario-specific field sizes, piece counts and formations.",
       "changeAuthority": "product-owner"
     },
     {
