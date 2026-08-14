@@ -94,8 +94,10 @@ def main() -> None:
     build_settings = (ROOT / "ProjectSettings/EditorBuildSettings.asset").read_text(encoding="utf-8")
     require("Assets/BFC/Scenes/Bootstrap.unity" in build_settings, "Bootstrap scene missing from build settings")
     require("Assets/BFC/Scenes/PhysicsLab.unity" in build_settings, "PhysicsLab scene missing from build settings")
-    require("Assets/BFC/Scenes/FormationLab.unity" in build_settings, "FormationLab scene missing from build settings")
-    require("4c0b1e29c3a746bda5f4910ef3217c88" in build_settings, "FormationLab build-settings GUID mismatch")
+    require(
+        "Assets/BFC/Scenes/FormationLab.unity" not in build_settings,
+        "FormationLab is a development harness and must stay out of production build settings",
+    )
 
     build_script = (ROOT / "Assets/BFC/Editor/Build/BfcBuild.cs").read_text(encoding="utf-8")
     require("BuildTarget.StandaloneWindows64" in build_script, "Windows x64 build target missing")
