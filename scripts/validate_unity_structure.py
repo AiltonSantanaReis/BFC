@@ -40,7 +40,15 @@ def main() -> None:
         "Assets/BFC/Gameplay/Matches/PhysicalActionResolution.cs",
         "Assets/BFC/Gameplay/Matches/MatchDomainEvent.cs",
         "Assets/BFC/Gameplay/Matches/MatchController.cs",
+        "Assets/BFC/Core/Fields/FieldDefinition.cs",
+        "Assets/BFC/Core/Formations/PieceRole.cs",
+        "Assets/BFC/Core/Formations/TeamCompositionDefinition.cs",
+        "Assets/BFC/Core/Formations/FormationSlot.cs",
+        "Assets/BFC/Core/Formations/FormationDefinition.cs",
+        "Assets/BFC/Core/Formations/FormationSpawn.cs",
+        "Assets/BFC/Core/Formations/FormationSpawnPlanner.cs",
         "Assets/BFC/Tests/EditMode/BFC.Core.EditMode.Tests.asmdef",
+        "Assets/BFC/Tests/EditMode/FormationFieldTests.cs",
         "Assets/BFC/Tests/PlayMode/BFC.Bootstrap.PlayMode.Tests.asmdef",
         "Assets/BFC/Tests/PhysicsEditMode/BFC.Physics.EditMode.Tests.asmdef",
         "Assets/BFC/Tests/PhysicsEditMode/PhysicsBenchmarkTests.cs",
@@ -51,6 +59,9 @@ def main() -> None:
         "scripts/run-unity-tests.ps1",
         "docs/12-PHASE2_PHYSICS_VERTICAL_SLICE.md",
         "docs/13-PHASE3_MATCH_CORE.md",
+        "docs/14-PHASE4_FORMATION_FIELD.md",
+        "docs/changes/RFC-0001-phase4-team-composition.md",
+        "docs/decisions/ADR-0003-mode-specific-formation-profiles.md",
     ]
     for relative in required_paths:
         require((ROOT / relative).exists(), f"Missing Unity project file: {relative}")
@@ -75,6 +86,9 @@ def main() -> None:
 
     build_script = (ROOT / "Assets/BFC/Editor/Build/BfcBuild.cs").read_text(encoding="utf-8")
     require("BuildTarget.StandaloneWindows64" in build_script, "Windows x64 build target missing")
+
+    core_asmdef = json.loads((ROOT / "Assets/BFC/Core/BFC.Core.asmdef").read_text(encoding="utf-8"))
+    require(core_asmdef.get("noEngineReferences") is True, "BFC.Core must remain engine-independent")
 
     physics_asmdef = json.loads((ROOT / "Assets/BFC/Physics/BFC.Physics.asmdef").read_text(encoding="utf-8"))
     require("Unity.InputSystem" not in physics_asmdef.get("references", []), "BFC.Physics must not depend on input")
@@ -103,7 +117,29 @@ def main() -> None:
     require("ResumeAfterRestart" in match_controller, "Match Core must keep restart possession explicit")
     require("DateTime.Now" not in match_controller, "Match Core must not use wall clock directly")
 
-    print("Unity Phase 3 structure validation passed.")
+    formation_paths = [
+        ROOT / "Assets/BFC/Core/Fields/FieldDefinition.cs",
+        ROOT / "Assets/BFC/Core/Formations/PieceRole.cs",
+        ROOT / "Assets/BFC/Core/Formations/TeamCompositionDefinition.cs",
+        ROOT / "Assets/BFC/Core/Formations/FormationSlot.cs",
+        ROOT / "Assets/BFC/Core/Formations/FormationDefinition.cs",
+        ROOT / "Assets/BFC/Core/Formations/FormationSpawn.cs",
+        ROOT / "Assets/BFC/Core/Formations/FormationSpawnPlanner.cs",
+    ]
+    for path in formation_paths:
+        source = path.read_text(encoding="utf-8")
+        require("UnityEngine" not in source, f"Phase 4 domain file must remain engine-independent: {path.name}")
+
+    composition_source = (ROOT / "Assets/BFC/Core/Formations/TeamCompositionDefinition.cs").read_text(encoding="utf-8")
+    require("LargeFieldEleven" in composition_source, "Large-field eleven profile is missing")
+    require("totalPieces: 11, goalkeeperCount: 1" in composition_source, "Large-field profile must remain 11 total including one goalkeeper")
+
+    rules = json.loads((ROOT / "governance/rules.json").read_text(encoding="utf-8"))["rules"]
+    open_001 = next((rule for rule in rules if rule.get("id") == "OPEN-001"), None)
+    require(open_001 is not None, "OPEN-001 governance record is missing")
+    require(open_001.get("status") == "locked", "OPEN-001 must remain resolved/locked for Phase 4")
+
+    print("Unity Phase 4 structure validation passed.")
 
 
 if __name__ == "__main__":
