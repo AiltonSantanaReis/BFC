@@ -1,0 +1,10 @@
+{
+  "name": "BFC.Core",
+  "rootNamespace": "BFC.Core",
+  "references": [],
+  "autoReferenced": false,
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "noEngineReferences": true
+}
