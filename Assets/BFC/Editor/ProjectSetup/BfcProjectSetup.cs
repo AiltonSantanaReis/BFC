@@ -87,7 +87,6 @@ namespace BFC.Editor.ProjectSetup
         private static void ApplyProjectSettings(UniversalRenderPipelineAsset pipelineAsset)
         {
             EditorSettings.serializationMode = SerializationMode.ForceText;
-            EditorSettings.defaultBehaviorMode = EditorBehaviorMode.Mode3D;
 
             PlayerSettings.productName = "BFC";
             PlayerSettings.companyName = "BFC";

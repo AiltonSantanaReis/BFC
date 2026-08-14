@@ -2,6 +2,7 @@
   "name": "BFC.Editor",
   "rootNamespace": "BFC.Editor",
   "references": [
+    "BFC.Bootstrap",
     "Unity.RenderPipelines.Universal.Runtime"
   ],
   "includePlatforms": [
