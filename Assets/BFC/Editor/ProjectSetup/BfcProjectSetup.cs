@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -73,15 +74,50 @@ namespace BFC.Editor.ProjectSetup
             ScriptableRendererData rendererData =
                 pipelineAsset.LoadBuiltinRendererData(RendererType.UniversalRenderer);
 
-            if (rendererData != null && !AssetDatabase.Contains(rendererData))
+            if (rendererData == null)
             {
-                rendererData.name = "BFC_UniversalRenderer";
-                AssetDatabase.CreateAsset(rendererData, RendererAssetPath);
+                throw new InvalidOperationException("Unity failed to create the built-in URP renderer data.");
             }
 
+            rendererData.name = "BFC_UniversalRenderer";
+            MoveRendererAssetIntoBfcSettings(rendererData);
+
+            EditorUtility.SetDirty(rendererData);
             EditorUtility.SetDirty(pipelineAsset);
             AssetDatabase.SaveAssets();
             return pipelineAsset;
+        }
+
+        private static void MoveRendererAssetIntoBfcSettings(ScriptableRendererData rendererData)
+        {
+            string sourcePath = AssetDatabase.GetAssetPath(rendererData);
+            if (string.IsNullOrWhiteSpace(sourcePath))
+            {
+                throw new InvalidOperationException("The generated URP renderer has no AssetDatabase path.");
+            }
+
+            if (string.Equals(sourcePath, RendererAssetPath, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            ScriptableRendererData staleRenderer =
+                AssetDatabase.LoadAssetAtPath<ScriptableRendererData>(RendererAssetPath);
+            if (staleRenderer != null)
+            {
+                if (!AssetDatabase.DeleteAsset(RendererAssetPath))
+                {
+                    throw new InvalidOperationException(
+                        $"Could not remove stale renderer asset at {RendererAssetPath}.");
+                }
+            }
+
+            string moveError = AssetDatabase.MoveAsset(sourcePath, RendererAssetPath);
+            if (!string.IsNullOrEmpty(moveError))
+            {
+                throw new InvalidOperationException(
+                    $"Could not move URP renderer to {RendererAssetPath}: {moveError}");
+            }
         }
 
         private static void ApplyProjectSettings(UniversalRenderPipelineAsset pipelineAsset)
