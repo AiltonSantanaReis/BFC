@@ -19,7 +19,7 @@ Decisão aprovada:
 
 Registro normativo:
 
-- `GAME-070` em `docs/01-GAMEPLAY_CONSTITUTION.md` e `governance/rules.json`;
+- `OPEN-001` agora está `locked` em `governance/rules.json` com a decisão aprovada;
 - `docs/changes/RFC-0001-phase4-team-composition.md`;
 - `docs/decisions/ADR-0003-mode-specific-formation-profiles.md`.
 
