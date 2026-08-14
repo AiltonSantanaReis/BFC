@@ -58,7 +58,7 @@ namespace BFC.PhysicsLab
             Material pieceAMaterial = CreateMaterial(new Color(0.05f, 0.85f, 1f));
             Material pieceBMaterial = CreateMaterial(new Color(1f, 0.08f, 0.72f));
             Material ballMaterial = CreateMaterial(new Color(0.92f, 0.95f, 1f));
-            PhysicMaterial collisionMaterial = CreateCollisionMaterial();
+            PhysicsMaterial collisionMaterial = CreateCollisionMaterial();
 
             CreateField(fixtures, fieldMaterial, wallMaterial, collisionMaterial);
 
@@ -103,7 +103,7 @@ namespace BFC.PhysicsLab
             Transform parent,
             Material fieldMaterial,
             Material wallMaterial,
-            PhysicMaterial collisionMaterial)
+            PhysicsMaterial collisionMaterial)
         {
             GameObject floor = GameObject.CreatePrimitive(PrimitiveType.Cube);
             floor.name = "Surface Fixture";
@@ -156,7 +156,7 @@ namespace BFC.PhysicsLab
             Vector3 scale,
             Transform parent,
             Material material,
-            PhysicMaterial collisionMaterial)
+            PhysicsMaterial collisionMaterial)
         {
             GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
             wall.name = name;
@@ -171,7 +171,7 @@ namespace BFC.PhysicsLab
             string name,
             Vector3 position,
             Material material,
-            PhysicMaterial collisionMaterial,
+            PhysicsMaterial collisionMaterial,
             Transform parent)
         {
             GameObject piece = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
@@ -208,7 +208,7 @@ namespace BFC.PhysicsLab
             string name,
             Vector3 position,
             Material material,
-            PhysicMaterial collisionMaterial,
+            PhysicsMaterial collisionMaterial,
             Transform parent)
         {
             GameObject ball = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -250,15 +250,15 @@ namespace BFC.PhysicsLab
             return material;
         }
 
-        private static PhysicMaterial CreateCollisionMaterial()
+        private static PhysicsMaterial CreateCollisionMaterial()
         {
-            var material = new PhysicMaterial("BFC PhysicsLab No Bounce")
+            var material = new PhysicsMaterial("BFC PhysicsLab No Bounce")
             {
                 dynamicFriction = 0f,
                 staticFriction = 0f,
                 bounciness = 0f,
-                frictionCombine = PhysicMaterialCombine.Minimum,
-                bounceCombine = PhysicMaterialCombine.Minimum,
+                frictionCombine = PhysicsMaterialCombine.Minimum,
+                bounceCombine = PhysicsMaterialCombine.Minimum,
                 hideFlags = HideFlags.DontSave
             };
             return material;
