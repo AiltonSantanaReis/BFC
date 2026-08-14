@@ -1,0 +1,21 @@
+{
+  "name": "BFC.Physics.EditMode.Tests",
+  "rootNamespace": "BFC.Tests.PhysicsEditMode",
+  "references": [
+    "BFC.Physics"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}
