@@ -1,0 +1,19 @@
+{
+  "name": "BFC.Bootstrap",
+  "rootNamespace": "BFC.Bootstrap",
+  "references": [
+    "BFC.Core",
+    "BFC.Gameplay",
+    "BFC.Physics",
+    "BFC.AI",
+    "BFC.Modes",
+    "BFC.Progression",
+    "BFC.Presentation",
+    "BFC.Infrastructure"
+  ],
+  "autoReferenced": true,
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "noEngineReferences": false
+}

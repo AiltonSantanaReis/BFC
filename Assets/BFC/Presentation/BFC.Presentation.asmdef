@@ -1,0 +1,10 @@
+{
+  "name": "BFC.Presentation",
+  "rootNamespace": "BFC.Presentation",
+  "references": ["BFC.Core", "BFC.Gameplay", "BFC.Progression"],
+  "autoReferenced": false,
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "noEngineReferences": false
+}

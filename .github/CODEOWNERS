@@ -1,0 +1,13 @@
+# Product/governance authority
+/docs/00-PRODUCT_CHARTER.md @AiltonSantanaReis
+/docs/01-GAMEPLAY_CONSTITUTION.md @AiltonSantanaReis
+/docs/02-VISUAL_CONSTITUTION.md @AiltonSantanaReis
+/docs/05-CHANGE_CONTROL.md @AiltonSantanaReis
+/governance/rules.json @AiltonSantanaReis
+/docs/changes/ @AiltonSantanaReis
+/docs/decisions/ @AiltonSantanaReis
+
+# Architecture boundaries
+/Assets/BFC/Core/ @AiltonSantanaReis
+/Assets/BFC/Bootstrap/ @AiltonSantanaReis
+/ProjectSettings/ @AiltonSantanaReis
