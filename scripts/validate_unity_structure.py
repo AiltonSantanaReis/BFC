@@ -31,14 +31,26 @@ def main() -> None:
         "Assets/BFC/Physics/PlanarKineticBody.cs",
         "Assets/BFC/PhysicsLab/BFC.PhysicsLab.asmdef",
         "Assets/BFC/PhysicsLab/PhysicsLabRuntimeBootstrap.cs",
+        "Assets/BFC/Gameplay/Matches/MatchPhase.cs",
+        "Assets/BFC/Gameplay/Matches/MatchFinishReason.cs",
+        "Assets/BFC/Gameplay/Matches/MatchScore.cs",
+        "Assets/BFC/Gameplay/Matches/MatchState.cs",
+        "Assets/BFC/Gameplay/Matches/PlayerActionCommand.cs",
+        "Assets/BFC/Gameplay/Matches/PlayerActionSubmissionResult.cs",
+        "Assets/BFC/Gameplay/Matches/PhysicalActionResolution.cs",
+        "Assets/BFC/Gameplay/Matches/MatchDomainEvent.cs",
+        "Assets/BFC/Gameplay/Matches/MatchController.cs",
         "Assets/BFC/Tests/EditMode/BFC.Core.EditMode.Tests.asmdef",
         "Assets/BFC/Tests/PlayMode/BFC.Bootstrap.PlayMode.Tests.asmdef",
         "Assets/BFC/Tests/PhysicsEditMode/BFC.Physics.EditMode.Tests.asmdef",
         "Assets/BFC/Tests/PhysicsEditMode/PhysicsBenchmarkTests.cs",
+        "Assets/BFC/Tests/GameplayEditMode/BFC.Gameplay.EditMode.Tests.asmdef",
+        "Assets/BFC/Tests/GameplayEditMode/MatchControllerTests.cs",
         "ProjectSettings/EditorBuildSettings.asset",
         "scripts/build-windows.ps1",
         "scripts/run-unity-tests.ps1",
         "docs/12-PHASE2_PHYSICS_VERTICAL_SLICE.md",
+        "docs/13-PHASE3_MATCH_CORE.md",
     ]
     for relative in required_paths:
         require((ROOT / relative).exists(), f"Missing Unity project file: {relative}")
@@ -72,7 +84,26 @@ def main() -> None:
     require("BFC.Physics" in lab_refs, "PhysicsLab must reference BFC.Physics")
     require("Unity.InputSystem" in lab_refs, "PhysicsLab must reference the Input System")
 
-    print("Unity Phase 2 structure validation passed.")
+    gameplay_asmdef = json.loads((ROOT / "Assets/BFC/Gameplay/BFC.Gameplay.asmdef").read_text(encoding="utf-8"))
+    gameplay_refs = gameplay_asmdef.get("references", [])
+    require("BFC.Core" in gameplay_refs, "BFC.Gameplay must reference BFC.Core")
+    require(gameplay_asmdef.get("noEngineReferences") is True, "BFC.Gameplay must remain engine-independent")
+    require("Unity.InputSystem" not in gameplay_refs, "BFC.Gameplay must not depend on the Input System")
+
+    gameplay_tests = json.loads(
+        (ROOT / "Assets/BFC/Tests/GameplayEditMode/BFC.Gameplay.EditMode.Tests.asmdef").read_text(encoding="utf-8")
+    )
+    gameplay_test_refs = gameplay_tests.get("references", [])
+    require("BFC.Core" in gameplay_test_refs, "Gameplay EditMode tests must reference BFC.Core")
+    require("BFC.Gameplay" in gameplay_test_refs, "Gameplay EditMode tests must reference BFC.Gameplay")
+
+    match_controller = (ROOT / "Assets/BFC/Gameplay/Matches/MatchController.cs").read_text(encoding="utf-8")
+    require("MaxActionsPerPossession" in match_controller, "Match Core must source the possession action limit from rules")
+    require("MatchPhase.ResolvingAction" in match_controller, "Match Core must represent pending physical resolution")
+    require("ResumeAfterRestart" in match_controller, "Match Core must keep restart possession explicit")
+    require("DateTime.Now" not in match_controller, "Match Core must not use wall clock directly")
+
+    print("Unity Phase 3 structure validation passed.")
 
 
 if __name__ == "__main__":
