@@ -1,0 +1,10 @@
+{
+  "name": "BFC.Infrastructure",
+  "rootNamespace": "BFC.Infrastructure",
+  "references": ["BFC.Core", "BFC.Progression"],
+  "autoReferenced": false,
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "noEngineReferences": false
+}
