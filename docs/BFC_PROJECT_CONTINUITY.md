@@ -8,10 +8,10 @@
 **HEAD conhecido de `main`:** `eb62dc4f93526685e41ab22a96aa591fa465c3c8` — PR #9  
 **Branch de trabalho atual:** `agent/phase4-final-gate`  
 **PR atual:** #10 — `Implement Phase 4 Windows performance gate`  
-**Estado do PR #10:** Draft, aberto, não mesclado; merge exige autorização explícita do Product Owner.  
-**Estado da Fase 4:** escopo e validação real **CONCLUÍDOS**; encerramento explicitamente autorizado pelo Product Owner; resta o fechamento administrativo do PR #10 (CI final, Ready for review e merge autorizado).  
-**HEAD local informado pelo Product Owner antes das atualizações documentais remotas finais:** `f5e854b` com working tree limpa.  
-**HEAD remoto verificado do PR #10 após a primeira atualização deste handoff:** `14bb6239f183e83dc9bb7aa47ceb84100d770913`; esta própria atualização documental cria um commit posterior, portanto o head exato deve sempre ser conferido no GitHub antes do merge.
+**Estado do PR #10:** Draft no momento desta edição, aberto e não mesclado; pode ser marcado Ready for review porque os checks do head `fe178fb1e1804319901829f175179d1f2af4d810` concluíram com sucesso. Merge exige autorização explícita do Product Owner.  
+**Estado da Fase 4:** escopo e validação real **CONCLUÍDOS**; encerramento explicitamente autorizado pelo Product Owner.  
+**Último HEAD local informado pelo Product Owner antes das atualizações documentais remotas:** `f5e854b` com working tree limpa.  
+**Head do PR #10 validado por CI imediatamente antes desta edição:** `fe178fb1e1804319901829f175179d1f2af4d810` — `Governance` success e `Unity Structure` success. Esta edição cria um commit posterior, portanto o head exato deve sempre ser conferido novamente antes do merge.
 
 > Este é o handoff operacional oficial do BFC. Ele existe para permitir retomar o projeto em uma nova conversa sem depender do histórico anterior.
 >
@@ -447,7 +447,7 @@ Nenhuma decisão de OPEN-002/003 foi tomada.
 ### Fase 4 — Formation & Field
 
 **Status de produto/engenharia:** **CONCLUÍDA** com autorização explícita do Product Owner em 2026-08-14.  
-**Status de integração em `main`:** PR #10 ainda precisa concluir CI final e ser mesclado com autorização separada.
+**Status de integração em `main`:** PR #10 ainda precisa ser mesclado com autorização separada.
 
 #### Fatia 1 — domínio
 
@@ -680,6 +680,23 @@ Consequência:
 - Fase 4 está concluída em escopo e validação real;
 - merge do PR #10 continua exigindo autorização separada.
 
+##### CI de fechamento
+
+Head validado imediatamente antes desta edição:
+
+```text
+fe178fb1e1804319901829f175179d1f2af4d810
+```
+
+Resultados:
+
+```text
+Governance      success
+Unity Structure success
+```
+
+Como esta edição do handoff cria um commit posterior, o head exato e os checks correspondentes devem ser verificados novamente antes do merge. Não fazer novo commit documental apenas para registrar o próprio SHA; usar o GitHub como fonte de verdade do head final.
+
 ---
 
 ## 10. PR #9 — continuidade operacional
@@ -716,15 +733,17 @@ O PR #10 ainda não foi mesclado, portanto o fechamento da Fase 4 ainda não est
 
 ### Branch do PR #10
 
-Sequência recente conhecida:
+Sequência recente conhecida inclui:
 
 ```text
 f5e854b  materialize FormationLab performance probe metadata
 3a10c720 close Phase 4 formation and field gate
 14bb6239 update continuity for Phase 4 closure
+4151bbe  record exact final Phase 4 documentation head
+fe178fb  finalize Phase 4 closure status
 ```
 
-Esta própria atualização cria um commit posterior a `14bb6239`. **Sempre verificar o head atual do PR #10 no GitHub antes de qualquer merge** e usar o SHA retornado naquele momento como `expected_head_sha`.
+Esta própria atualização cria um commit posterior a `fe178fb`. **Sempre verificar o head atual do PR #10 no GitHub antes de qualquer merge** e usar o SHA retornado naquele momento como `expected_head_sha`.
 
 ### Situação local do Product Owner
 
@@ -1021,8 +1040,8 @@ Depende de OPEN-002/003.
 
 No momento desta atualização:
 
-1. confirmar o novo head exato do PR #10;
-2. aguardar/confirmar `Governance` e `Unity Structure` verdes nesse head;
+1. obter o novo head exato do PR #10 após esta edição;
+2. confirmar `Governance` e `Unity Structure` nesse head;
 3. se ambos verdes, marcar PR #10 como **Ready for review**;
 4. **não fazer merge ainda**;
 5. pedir/aguardar autorização explícita do Product Owner para merge;
@@ -1150,5 +1169,5 @@ OPEN-002/003 continuam abertas.
 Classic Simulation está na issue #7 e precisa de Classic Strike Model antes/durante a Fase 5.
 PR #10 ainda não foi mesclado.
 Nenhum merge sem autorização explícita do Product Owner.
-Próximo: CI final do head documental -> Ready for review -> pedir autorização de merge.
+Próximo: confirmar CI do head atual -> Ready for review -> pedir autorização de merge.
 ```
