@@ -1,17 +1,18 @@
 # BFC — Documento Mestre de Continuidade, Status e Handoff
 
-**Versão:** 1.1  
-**Última atualização operacional:** 2026-08-14 22:51 (BRT / UTC-03:00)  
+**Versão:** 1.2
+**Última atualização operacional:** 2026-08-15 07:20 (BRT / UTC-03:00)
 **Repositório:** `AiltonSantanaReis/BFC`  
 **Workspace local principal:** `F:\Projetos\BFC`  
 **Branch canônica:** `main`  
-**HEAD conhecido de `main`:** `eb62dc4f93526685e41ab22a96aa591fa465c3c8` — PR #9  
-**Branch de trabalho atual:** `agent/phase4-final-gate`  
-**PR atual:** #10 — `Implement Phase 4 Windows performance gate`  
-**Estado do PR #10:** Draft no momento desta edição, aberto e não mesclado. O head `1951a291e5ad92fa52fe69fca0787d4b4ee96fff` concluiu `Governance` e `Unity Structure` com `success`, portanto o PR está apto a ser marcado Ready for review. Merge exige autorização explícita do Product Owner.  
-**Estado da Fase 4:** escopo e validação real **CONCLUÍDOS**; encerramento explicitamente autorizado pelo Product Owner.  
-**Último HEAD local informado pelo Product Owner antes das atualizações documentais remotas:** `f5e854b` com working tree limpa.  
-**Head validado por CI imediatamente antes desta edição:** `1951a291e5ad92fa52fe69fca0787d4b4ee96fff`. Esta edição cria um commit posterior; por projeto, não faremos outro commit apenas para registrar o próprio SHA. O GitHub é a fonte de verdade do head final antes do merge.
+**HEAD confirmado de `main`:** `68279f8b89c5ecd70d380cc83071d2c2a5dfa6cf` — merge do PR #10
+**Branch de trabalho atual:** `agent/post-phase4-continuity`
+**PR atual:** #11 — `Refresh continuity after Phase 4 merge`
+**Estado do PR #11:** Draft, documentação apenas, aberto e não mesclado. Merge exige autorização explícita do Product Owner.
+**Estado da Fase 4:** **CONCLUÍDA E INTEGRADA EM `main`**.
+**Merge SHA do PR #10:** `68279f8b89c5ecd70d380cc83071d2c2a5dfa6cf`.
+**Head final do PR #10 antes do merge:** `bf0ce52196186f31145d60f7d9cd81c8600b8f44`; `Governance` e `Unity Structure` concluíram com `success`.
+**Estado local confirmado pelo Product Owner antes desta atualização:** branch `agent/post-phase4-continuity`, HEAD `68279f8b89c5ecd70d380cc83071d2c2a5dfa6cf`, working tree limpa.
 
 > Este é o handoff operacional oficial do BFC. Ele existe para permitir retomar o projeto em uma nova conversa sem depender do histórico anterior.
 >
@@ -26,7 +27,7 @@ Use este prompt:
 ```text
 Estamos continuando o projeto BFC no repositório AiltonSantanaReis/BFC.
 Use docs/BFC_PROJECT_CONTINUITY.md como handoff operacional.
-Antes de alterar código, confira no GitHub o HEAD atual de main, o PR #10 (se ainda existir),
+Antes de alterar código, confira no GitHub o HEAD atual de main, PRs abertos,
 issues relevantes e os documentos normativos.
 Não mude regras LOCKED por conveniência técnica.
 OPEN-002 e OPEN-003 permanecem abertas.
@@ -447,7 +448,7 @@ Nenhuma decisão de OPEN-002/003 foi tomada.
 ### Fase 4 — Formation & Field
 
 **Status de produto/engenharia:** **CONCLUÍDA** com autorização explícita do Product Owner em 2026-08-14.  
-**Status de integração em `main`:** PR #10 ainda precisa ser mesclado com autorização separada.
+**Status de integração em `main`:** **CONCLUÍDA** pelo squash merge do PR #10 em `68279f8b89c5ecd70d380cc83071d2c2a5dfa6cf`.
 
 #### Fatia 1 — domínio
 
@@ -531,7 +532,7 @@ Validação final da fatia 2:
 
 #### Fatia 3 — Windows performance gate / PR #10
 
-Branch:
+Branch de desenvolvimento usada:
 
 ```text
 agent/phase4-final-gate
@@ -678,24 +679,32 @@ Consequência:
 - o Development Plan não exige essa integração como gate da Fase 4;
 - integração será feita quando as fases de ações/orquestração realmente precisarem dela;
 - Fase 4 está concluída em escopo e validação real;
-- merge do PR #10 continua exigindo autorização separada.
+- OPEN-002 e OPEN-003 permaneceram intocadas.
 
-##### CI de fechamento
+##### CI e merge de fechamento
 
-Head validado imediatamente antes desta edição:
+Head final do PR #10 antes do merge:
 
 ```text
-1951a291e5ad92fa52fe69fca0787d4b4ee96fff
+bf0ce52196186f31145d60f7d9cd81c8600b8f44
 ```
 
-Resultados:
+Resultados desse head:
 
 ```text
 Governance      success
 Unity Structure success
 ```
 
-Como esta edição cria um commit posterior, o head exato deve ser conferido no GitHub e os checks desse novo head devem concluir verdes antes do merge. Não criar novos commits documentais apenas para registrar o próprio SHA.
+O PR foi marcado Ready for review, recebeu autorização explícita do Product Owner e foi mesclado por squash.
+
+Merge SHA / novo `main`:
+
+```text
+68279f8b89c5ecd70d380cc83071d2c2a5dfa6cf
+```
+
+Caveat de evidência: os testes Unity reais e a captura Windows foram executados antes dos commits finais exclusivamente de metadata/documentação. Não declarar que o merge SHA foi reexecutado em Unity.
 
 ---
 
@@ -711,14 +720,6 @@ eb62dc4f93526685e41ab22a96aa591fa465c3c8
 
 Ele introduziu este documento no repositório e corrigiu status defasados das Fases 3 e 4.
 
-Após o merge, o Product Owner sincronizou localmente:
-
-```text
-main = eb62dc4
-origin/main = eb62dc4
-working tree = limpa
-```
-
 ---
 
 ## 11. Estado atual do repositório nesta atualização
@@ -726,39 +727,48 @@ working tree = limpa
 ### `main`
 
 ```text
-HEAD conhecido: eb62dc4f93526685e41ab22a96aa591fa465c3c8
+HEAD confirmado: 68279f8b89c5ecd70d380cc83071d2c2a5dfa6cf
 ```
 
-O PR #10 ainda não foi mesclado, portanto o fechamento da Fase 4 ainda não está integrado em `main`.
+O PR #10 foi mesclado; o fechamento da Fase 4 está integrado em `main`.
 
-### Branch do PR #10
+Após o merge, o Product Owner sincronizou localmente:
 
-Sequência recente conhecida inclui:
-
-```text
-f5e854b  materialize FormationLab performance probe metadata
-3a10c720 close Phase 4 formation and field gate
-14bb6239 update continuity for Phase 4 closure
-4151bbe  record exact final Phase 4 documentation head
-fe178fb  finalize Phase 4 closure status
-8f8c165  record green current Phase 4 head
-2718acd  prepare continuity for PR review state
-1951a29  final continuity pre-merge state
+```powershell
+git switch main
+git pull --ff-only
+git log -1 --oneline
+git status --short
 ```
 
-Esta própria atualização cria um commit posterior. **Sempre verificar o head atual do PR #10 no GitHub antes de qualquer merge** e usar o SHA retornado naquele momento como `expected_head_sha`.
-
-### Situação local do Product Owner
-
-A última evidência local antes das atualizações remotas documentais:
+Resultado:
 
 ```text
-branch: agent/phase4-final-gate
-HEAD: f5e854b
+68279f8 (HEAD -> main, origin/main, origin/HEAD) Implement Phase 4 Windows performance gate (#10)
 working tree: limpa
 ```
 
-Será necessário `git pull --ff-only` para receber as atualizações documentais finais da branch.
+### Branch documental pós-Fase 4
+
+```text
+agent/post-phase4-continuity
+```
+
+Foi criada exatamente a partir de `68279f8b89c5ecd70d380cc83071d2c2a5dfa6cf` para atualizar este handoff sem misturar trabalho técnico da Fase 5.
+
+PR documental atual:
+
+```text
+#11 — Refresh continuity after Phase 4 merge
+```
+
+Escopo do PR #11:
+
+- somente `docs/BFC_PROJECT_CONTINUITY.md`;
+- nenhuma alteração em código Unity/C#;
+- nenhuma alteração de regra;
+- nenhuma alteração de OPEN-002/003;
+- nenhuma alteração de build/runtime.
 
 ---
 
@@ -985,7 +995,7 @@ sem apagá-lo ou reinterpretá-lo como comportamento típico.
 
 ### Fase 5 — Advanced Actions
 
-Próxima fase de implementação após o merge/fechamento administrativo da Fase 4.
+Próxima fase de implementação após o fechamento documental pós-Fase 4.
 
 Entregas normativas:
 
@@ -1043,12 +1053,12 @@ Depende de OPEN-002/003.
 
 No momento desta atualização:
 
-1. obter o novo head exato do PR #10 após esta edição;
-2. confirmar `Governance` e `Unity Structure` nesse head;
-3. se ambos verdes, marcar PR #10 como **Ready for review**;
-4. **não fazer merge ainda**;
-5. pedir/aguardar autorização explícita do Product Owner para merge;
-6. quando autorizada, revalidar head e CI e fazer squash merge;
+1. validar o head atual do PR #11;
+2. confirmar que o diff do PR #11 contém somente `docs/BFC_PROJECT_CONTINUITY.md` e apenas atualização documental pós-merge;
+3. confirmar `Governance` e `Unity Structure` no head final do PR #11;
+4. manter PR #11 como **Draft** até a revisão ficar concluída;
+5. **não fazer merge sem autorização explícita do Product Owner**;
+6. quando autorizado, revalidar head/CI e fazer squash merge;
 7. no PC do Product Owner executar:
 
 ```powershell
@@ -1058,8 +1068,9 @@ git log -1 --oneline
 git status --short
 ```
 
-8. registrar o merge SHA da Fase 4 neste handoff na próxima atualização;
-9. iniciar a preparação da Fase 5 pela especificação/arquitetura das Advanced Actions e Classic Strike Model.
+8. iniciar a preparação formal da Fase 5 em nova branch a partir do `main` atualizado;
+9. antes de alterar runtime, revisar Development Plan, Gameplay Constitution, Architecture e issue #7;
+10. especificar arquitetura/contratos das Advanced Actions e do Classic Strike Model sem antecipar OPEN-002/003.
 
 ---
 
@@ -1102,9 +1113,9 @@ Antes de abandonar uma conversa longa:
 - [x] defeitos standalone e solução registrados;
 - [x] metadata final da Fase 4 registrada;
 - [x] decisão de encerramento da Fase 4 registrada;
+- [x] merge SHA do PR #10 registrado: `68279f8b89c5ecd70d380cc83071d2c2a5dfa6cf`;
 - [x] regra de autorização de merge registrada;
-- [x] próximo passo explícito;
-- [ ] merge SHA do PR #10 — ainda não existe neste momento.
+- [x] próximo passo explícito.
 
 ---
 
@@ -1149,7 +1160,8 @@ PRs/merges conhecidos:
 #6 Phase 4 Domain           -> 6b80ee5bfe65d9fb183c9f05db175b864db005e9
 #8 Phase 4 Runtime          -> 5ab0db9583aad4c7695dea1aeeb8863208dcfec1
 #9 Continuity handoff       -> eb62dc4f93526685e41ab22a96aa591fa465c3c8
-#10 Phase 4 final gate      -> OPEN / NOT MERGED
+#10 Phase 4 final gate      -> 68279f8b89c5ecd70d380cc83071d2c2a5dfa6cf
+#11 Post-Phase 4 continuity -> OPEN / DRAFT / DOCUMENTATION ONLY
 ```
 
 ---
@@ -1161,16 +1173,16 @@ Projeto: BFC em Unity 6.3 LTS / 6000.3.21f1.
 Referência funcional: BFC legado.
 Referência visual: Interface e Menu.
 Windows primeiro.
-Fases 0, 1, 2 e 3 concluídas e mescladas.
-Fase 4: domínio + runtime mesclados; performance gate validado no PR #10.
-Product Owner autorizou encerrar a Fase 4 com o escopo atual.
+Fases 0, 1, 2, 3 e 4 concluídas e integradas.
+main confirmado = 68279f8b89c5ecd70d380cc83071d2c2a5dfa6cf.
+PR #10 foi mesclado por squash e encerrou formalmente a Fase 4.
 Campo grande = 11 total por time = 10 linha + 1 goleiro.
 FormationLab: EditMode 21/21; PlayMode 2/2; inspeção visual aprovada.
 Windows performance: 23595 samples, avg 0.424ms, p95 0.527ms, p99 1.012ms, max 275.347ms.
 Performance numbers são evidência de harness, não requisito de produção.
 OPEN-002/003 continuam abertas.
 Classic Simulation está na issue #7 e precisa de Classic Strike Model antes/durante a Fase 5.
-PR #10 ainda não foi mesclado.
+PR #11 é apenas a atualização documental pós-merge da Fase 4.
 Nenhum merge sem autorização explícita do Product Owner.
-Próximo: confirmar CI do head atual -> Ready for review -> pedir autorização de merge.
+Próximo: concluir PR #11 -> sincronizar main -> preparar especificação/arquitetura da Fase 5.
 ```
