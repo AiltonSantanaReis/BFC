@@ -1,8 +1,10 @@
+using System;
 using System.IO;
 using BFC.Editor.ProjectSetup;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
+using UnityEngine;
 
 namespace BFC.Editor.Build
 {
@@ -14,6 +16,13 @@ namespace BFC.Editor.Build
         public const string WindowsOutputPath = "Builds/Windows/BFC.exe";
         public const string FormationLabWindowsOutputPath = "Builds/FormationLab/BFC-FormationLab.exe";
         public const string FormationLabScenePath = "Assets/BFC/Scenes/FormationLab.unity";
+
+        private const string FormationLabBuildAssetsDirectory =
+            "Assets/BFC/Settings/FormationLabBuildAssets";
+        private const string FormationLabBuildResourcesDirectory =
+            FormationLabBuildAssetsDirectory + "/Resources";
+        private const string FormationLabRuntimeMaterialAssetPath =
+            FormationLabBuildResourcesDirectory + "/BFCFormationLabRuntimeMaterial.mat";
 
         [MenuItem("BFC/Build/Windows x64")]
         public static void BuildWindows64()
@@ -33,10 +42,52 @@ namespace BFC.Editor.Build
             BfcProjectSetup.ApplyPhase1Setup();
             Directory.CreateDirectory("Builds/FormationLab");
 
-            BuildPlayer(
-                new[] { FormationLabScenePath },
-                FormationLabWindowsOutputPath,
-                "BFC FormationLab Windows build");
+            CreateFormationLabRuntimeMaterialResource();
+            try
+            {
+                BuildPlayer(
+                    new[] { FormationLabScenePath },
+                    FormationLabWindowsOutputPath,
+                    "BFC FormationLab Windows build");
+            }
+            finally
+            {
+                RemoveFormationLabBuildAssets();
+            }
+        }
+
+        private static void CreateFormationLabRuntimeMaterialResource()
+        {
+            RemoveFormationLabBuildAssets();
+
+            Directory.CreateDirectory(FormationLabBuildResourcesDirectory);
+            AssetDatabase.Refresh();
+
+            Shader shader = Shader.Find("Universal Render Pipeline/Lit");
+            if (shader == null)
+            {
+                throw new InvalidOperationException(
+                    "Could not resolve the URP Lit shader while preparing the FormationLab build resource.");
+            }
+
+            var material = new Material(shader)
+            {
+                name = "BFCFormationLabRuntimeMaterial"
+            };
+
+            AssetDatabase.CreateAsset(material, FormationLabRuntimeMaterialAssetPath);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+        }
+
+        private static void RemoveFormationLabBuildAssets()
+        {
+            if (AssetDatabase.IsValidFolder(FormationLabBuildAssetsDirectory))
+            {
+                AssetDatabase.DeleteAsset(FormationLabBuildAssetsDirectory);
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+            }
         }
 
         private static void BuildPlayer(string[] scenes, string outputPath, string description)
@@ -57,7 +108,7 @@ namespace BFC.Editor.Build
                     $"errors={report.summary.totalErrors}, warnings={report.summary.totalWarnings}");
             }
 
-            UnityEngine.Debug.Log(
+            Debug.Log(
                 $"[BFC] {description} succeeded: {outputPath} " +
                 $"({report.summary.totalSize} bytes)");
         }
