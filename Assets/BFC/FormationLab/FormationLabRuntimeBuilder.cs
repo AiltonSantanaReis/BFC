@@ -5,6 +5,7 @@ using BFC.Core.Formations;
 using BFC.Core.Matches;
 using BFC.Physics;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace BFC.FormationLab
 {
@@ -346,22 +347,25 @@ namespace BFC.FormationLab
 
         private static Material CreateMaterial(Color color)
         {
-            Shader shader = Shader.Find("Universal Render Pipeline/Lit");
-            if (shader == null)
+            RenderPipelineAsset pipeline = GraphicsSettings.currentRenderPipeline;
+            if (pipeline == null)
             {
-                shader = Shader.Find("Standard");
+                pipeline = GraphicsSettings.defaultRenderPipeline;
             }
 
-            if (shader == null)
+            Material template = pipeline != null ? pipeline.defaultMaterial : null;
+            if (template == null)
             {
-                throw new InvalidOperationException("FormationLab could not resolve a runtime material shader.");
+                throw new InvalidOperationException(
+                    "FormationLab could not resolve the active render pipeline default material.");
             }
 
-            return new Material(shader)
+            Material material = new Material(template)
             {
-                color = color,
                 hideFlags = HideFlags.DontSave
             };
+            material.color = color;
+            return material;
         }
 
         private static PhysicsMaterial CreateCollisionMaterial()
