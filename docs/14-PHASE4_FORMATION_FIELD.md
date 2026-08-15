@@ -1,6 +1,6 @@
 # BFC Phase 4 — Formation & Field
 
-Status: **COMPLETE — PRODUCT OWNER CLOSURE APPROVED; PR #10 PENDING FINAL CI / MERGE**
+Status: **COMPLETE — PRODUCT OWNER CLOSURE APPROVED; PR #10 READY FOR REVIEW / MERGE AUTHORIZATION**
 
 ## Objetivo
 
@@ -211,7 +211,7 @@ A resolução de `OPEN-001` e o preview de runtime não escolhem silenciosamente
 - [x] evidência objetiva de performance do preview capturada com sucesso no target Windows;
 - [x] `.meta` do novo `FormationLabPerformanceProbe.cs` revisado e versionado;
 - [x] Product Owner decidiu explicitamente que o escopo atual satisfaz o gate completo, sem fatia adicional de Match Core/perfis nesta fase;
-- [ ] validar CI no head final do PR #10 após as atualizações documentais finais.
+- [x] CI `Governance` e `Unity Structure` verdes no head `4151bbe0d390b0a14524260cbe5da0c0c7feeca1` imediatamente anterior a este registro final; como este commit altera apenas documentação, os checks do novo head ainda devem ser conferidos antes do merge.
 
 ## Decisão de encerramento da Fase 4
 
@@ -219,12 +219,12 @@ Em 2026-08-14, o Product Owner autorizou explicitamente: **encerrar a Fase 4 com
 
 A decisão é compatível com `docs/04-DEVELOPMENT_PLAN.md`: o gate normativo exige configuração de composição, campo/formação, spawn seguro, testes e performance estável no target Windows. Integração adicional com Match Core não aparece como entrega/gate obrigatório da Fase 4 e, portanto, não será introduzida apenas para ampliar escopo depois que o gate definido foi satisfeito.
 
-A Fase 4 está **concluída em escopo e validação real**. O único passo administrativo ainda pendente neste PR é obter CI verde no head documental final e então deixar o PR #10 pronto para revisão/merge. O merge continua sujeito a autorização explícita separada do Product Owner.
+A Fase 4 está **concluída em escopo e validação real**. O PR #10 pode ser colocado como Ready for review assim que os checks do head documental atual terminarem verdes. O merge continua sujeito a autorização explícita separada do Product Owner.
 
 ## Próximo passo
 
-- obter `Governance` e `Unity Structure` verdes no head final do PR #10;
-- marcar o PR #10 como Ready for review somente após esses checks concluírem;
+- confirmar `Governance` e `Unity Structure` verdes no head documental atual do PR #10;
+- marcar o PR #10 como Ready for review;
 - não mesclar sem autorização explícita do Product Owner;
 - após o merge, sincronizar `main` local e registrar o merge SHA no handoff;
 - iniciar a preparação da Fase 5 — Advanced Actions, incluindo a especificação do `BFC Classic Simulation` / Classic Strike Model antes ou durante a fase, sem antecipar decisões de `OPEN-002`/`OPEN-003`.
