@@ -82,12 +82,14 @@ namespace BFC.Editor.Build
 
         private static void RemoveFormationLabBuildAssets()
         {
-            if (AssetDatabase.IsValidFolder(FormationLabBuildAssetsDirectory))
+            if (!AssetDatabase.IsValidFolder(FormationLabBuildAssetsDirectory))
             {
-                AssetDatabase.DeleteAsset(FormationLabBuildAssetsDirectory);
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
+                return;
             }
+
+            AssetDatabase.DeleteAsset(FormationLabBuildAssetsDirectory);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
         }
 
         private static void BuildPlayer(string[] scenes, string outputPath, string description)
