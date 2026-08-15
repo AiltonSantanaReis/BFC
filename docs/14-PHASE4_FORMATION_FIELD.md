@@ -120,6 +120,45 @@ Merge:
 - PR #8: `Implement Phase 4 runtime field materialization`;
 - merge por squash: `5ab0db9583aad4c7695dea1aeeb8863208dcfec1`.
 
+## Terceira fatia — gate objetivo de performance Windows
+
+O PR #10 adiciona um build Windows x64 dedicado ao `FormationLab` e um probe opt-in de frame time. O harness permanece fora do build de produção e não fixa um requisito numérico de FPS.
+
+A validação real em Windows/Unity 6000.3.21f1 expôs dois defeitos player-only antes da captura funcionar:
+
+1. shaders localizados apenas por `Shader.Find(...)` não estavam garantidos no player standalone;
+2. o `defaultMaterial` do Render Pipeline Asset não era uma fonte utilizável no standalone dedicado.
+
+A infraestrutura do PR passou então a criar, somente durante o build diagnóstico, um Material URP Lit temporário sob `Resources`, garantindo uma referência concreta no player. O diretório temporário é removido ao final do build e não permanece no repositório.
+
+### Evidência real de performance
+
+Captura concluída com sucesso no target Windows do Product Owner:
+
+- Unity: **6000.3.21f1**;
+- resolução: **1280 x 720**;
+- warmup: **2 s**;
+- janela de amostragem: **10 s**;
+- VSync desativado apenas para o diagnóstico;
+- CPU registrada: **AMD Ryzen 7 5700X3D 8-Core Processor**;
+- GPU registrada: **NVIDIA GeForce RTX 3070 Ti**;
+- amostras: **23595**;
+- frame time médio: **0.424 ms**;
+- mediana: **0.383 ms**;
+- p95: **0.527 ms**;
+- p99: **1.012 ms**;
+- máximo observado: **275.347 ms**;
+- FPS médio derivado do frame time: **2359.451**.
+
+Interpretação de gate: a distribuição central e os percentis permanecem baixos durante a janela de 10 s e a captura completa sem timeout, crash ou erro de runtime. O valor máximo isolado é registrado como outlier e não é apagado da evidência. Nenhum desses números é declarado requisito de produção; o objetivo é demonstrar estabilidade do preview atual no target Windows dentro deste escopo de laboratório.
+
+Após o build/captura, `Assets/BFC/Settings/FormationLabBuildAssets` foi confirmado como ausente (`Test-Path` = `False`), portanto o asset temporário não deixou ruído no workspace.
+
+Na mesma revisão do head `96464f0`:
+
+- EditMode: **21/21 passed**;
+- PlayMode: **2/2 passed**.
+
 ## Restrições de arquitetura
 
 - nenhum número de peças pode ficar hardcoded em lógica central de partida;
@@ -157,22 +196,26 @@ A resolução de `OPEN-001` e o preview de runtime não escolhem silenciosamente
 - [x] Unity 6000.3.21f1 importa/compila a segunda fatia após as correções;
 - [x] EditMode permanece **21/21**;
 - [x] PlayMode passa **2/2**;
-- [x] novos `.meta` gerados pelo Unity revisados e commitados;
+- [x] novos `.meta` gerados pelo Unity revisados e commitados na segunda fatia;
 - [x] inspeção manual do FormationLab confirma campo, 22 peças, 2 goleiros, bola e gols visíveis;
 - [x] CI Governance e Unity Structure verdes no head final da segunda fatia;
-- [ ] registrar evidência objetiva suficiente de performance estável do preview no target Windows;
-- [ ] decidir explicitamente se o gate da Fase 4 exige uma fatia adicional de integração com o fluxo de partida ou perfis adicionais de campo/formação antes de encerrar a fase.
+- [x] evidência objetiva de performance do preview capturada com sucesso no target Windows;
+- [ ] revisar e versionar o `.meta` do novo `FormationLabPerformanceProbe.cs`;
+- [ ] Product Owner decidir explicitamente se o escopo atual satisfaz o gate completo ou se exige uma fatia adicional de integração/perfis antes de encerrar a fase;
+- [ ] validar CI no head final após metadata/documentação.
 
-## Estado da fase após PR #8
+## Estado atual
 
-As duas primeiras fatias da Fase 4 estão concluídas e mescladas. A fase permanece **ACTIVE** porque o plano normativo exige performance estável no target Windows e ainda deve haver uma decisão explícita sobre a suficiência do escopo atual para fechar o gate completo.
+O requisito de performance estável do preview no target Windows possui agora evidência objetiva no escopo atual. A Fase 4 permanece formalmente **ACTIVE** somente porque ainda faltam consolidar o `.meta` do novo probe, validar o head final e registrar a decisão explícita do Product Owner sobre suficiência do escopo.
 
-Não iniciar silenciosamente a Fase 5 como se a Fase 4 já estivesse encerrada.
+O plano normativo da Fase 4 exige campo/formação, spawn seguro, testes e performance estável; ele não lista integração com o Match Core como entrega ou gate obrigatório. Portanto, uma fatia adicional de Match Core deve existir apenas se o Product Owner decidir ampliar o escopo da fase, não como requisito implícito.
+
+Não iniciar silenciosamente a Fase 5 enquanto esses itens finais não forem fechados.
 
 ## Próximo passo
 
-- capturar evidência mínima e objetiva de performance do FormationLab em Windows;
-- revisar se materialização + testes atuais já satisfazem o requisito de campo/formação jogável ou se falta integração adicional com o Match Core;
-- decidir se perfis adicionais precisam ser materializados antes do gate;
-- quando o Product Owner aprovar o fechamento, atualizar status/documentação da Fase 4 para concluída;
+- revisar e versionar `FormationLabPerformanceProbe.cs.meta`;
+- confirmar CI verde no head final;
+- Product Owner decidir se a Fase 4 pode ser encerrada com o escopo atual;
+- se aprovada a suficiência, atualizar status da Fase 4 para concluída e atualizar `docs/BFC_PROJECT_CONTINUITY.md` antes do merge final;
 - preparar a especificação do `BFC Classic Simulation` / Classic Strike Model antes ou durante a Fase 5, sem antecipar decisões de `OPEN-002`/`OPEN-003`.
