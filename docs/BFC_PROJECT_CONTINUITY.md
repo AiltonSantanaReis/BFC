@@ -15,7 +15,7 @@
 
 > Este é o handoff operacional oficial do BFC. Ele existe para permitir retomar o projeto em uma nova conversa sem depender do histórico anterior.
 >
-> Ele **não substitui documentos normativos**. Em caso de conflito, prevalecem a decisão explícita mais recente do Product Owner registrada no repositório, `governance/rules.json`, Product Charter, Gameplay Constitution, Visual Constitution, ADRs/RFCs e Development Plan, nesta ordem de autoridade documentada.
+> Ele **não substitui documentos normativos**. Em caso de conflito, prevalece a ordem de autoridade registrada abaixo e nos documentos normativos do repositório.
 
 ---
 
@@ -44,22 +44,31 @@ Ao retomar:
 
 ---
 
-## 2. Identidade e referências oficiais
+## 2. Identidade e direção oficial do produto
 
-O produto oficial chama-se **BFC** e está sendo reconstruído do zero em **Unity**.
+O produto oficial chama-se **BFC** e está sendo reconstruído do zero em **Unity**, usando os materiais anteriores como referência funcional e visual, sem transportar a arquitetura legada como dependência de produção.
 
 ### Referência funcional
 
 `BFC(1).zip` / BFC legado serve como referência de intenção para:
 
 - seleção + drag/aim + força + release;
+- potência e sensação física;
 - chute, passe, spin e chip;
-- física percebida e resolução antes da próxima ação;
+- resolução física antes da próxima ação;
 - até 3 ações por posse quando o ruleset exigir;
 - goleiro automático;
 - P1 vs COM e P1 vs P2;
-- Liga Justa, Campeonato, Treino e Desafios;
-- progressão, economia, missões, conquistas, troféus/vitrine e save.
+- Liga Justa;
+- Campeonato;
+- Treino e Desafios;
+- progressão;
+- economia;
+- missões;
+- conquistas;
+- troféus/vitrine;
+- recompensas inclusive em derrota;
+- save e perfil.
 
 Não transportar como requisito:
 
@@ -77,17 +86,50 @@ Não transportar como requisito:
 
 - identidade cyber/neon;
 - cyan e magenta;
-- composição e hierarquia;
-- cards, painéis e modais;
+- composição e layout;
+- hierarquia;
+- cards;
+- painéis;
+- modais;
 - fundos;
 - vitrine de troféus;
-- densidade visual, animações e atmosfera.
+- densidade visual;
+- animações e atmosfera.
 
 Migrar para Unity **não autoriza redesign** da identidade aprovada.
 
+### Princípios de produto
+
+- física legível;
+- decisões táticas;
+- habilidade de execução;
+- competitivo sem pay-to-win;
+- cosméticos não alteram desempenho competitivo;
+- regras autoritativas não ficam na UI;
+- IA usa as mesmas regras válidas do jogador;
+- online real futuro exige autoridade de backend/server.
+
 ---
 
-## 3. Baseline técnico e arquitetura
+## 3. Ordem de autoridade
+
+Quando houver conflito:
+
+1. decisão explícita mais recente do Product Owner registrada no repositório;
+2. `governance/rules.json`;
+3. `docs/00-PRODUCT_CHARTER.md`;
+4. `docs/01-GAMEPLAY_CONSTITUTION.md`;
+5. `docs/02-VISUAL_CONSTITUTION.md`;
+6. ADRs/RFCs aceitos;
+7. `docs/04-DEVELOPMENT_PLAN.md`;
+8. comportamento de referência do legado;
+9. implementação atual.
+
+**Código não tem autoridade superior à regra aprovada.**
+
+---
+
+## 4. Baseline técnico e arquitetura
 
 - Unity **6.3 LTS**;
 - editor exato **6000.3.21f1**;
@@ -129,27 +171,63 @@ Assets/BFC/
 └── Tests/
 ```
 
+Responsabilidades resumidas:
+
+- `BFC.Core`: entidades, value objects, identificadores, contratos e definições independentes da engine;
+- `BFC.Gameplay`: lifecycle, turno, posse, comandos, validação, score, relógio e transições;
+- `BFC.Physics`: impulso, colisão, desaceleração, repouso, spin, bola aérea e bridge com PhysX;
+- `BFC.AI`: percepção, avaliação, seleção, planejamento, força/direção e dificuldade;
+- `BFC.Modes`: composição de rulesets;
+- `BFC.Progression`: perfil, inventário, moedas, missões, conquistas, troféus e recompensas;
+- `BFC.Presentation`: UI, HUD, navegação, câmeras, VFX e feedback;
+- `BFC.Infrastructure`: save, armazenamento, plataforma e serviços futuros;
+- `BFC.Bootstrap`: composition root autorizado.
+
 ---
 
-## 4. Regras de gameplay já protegidas
+## 5. Regras de gameplay já protegidas
+
+### Núcleo
 
 - futebol de botão por ações;
 - controle moderno: selecionar + drag/aim + força + release;
 - aguardar resolução física antes da próxima ação;
 - competitivo oficial: até **3 ações por posse** quando o ruleset usar essa regra;
 - `ação` não é automaticamente igual a `toque na bola`;
+- P1 vs COM;
+- P1 vs P2.
+
+### Ações
+
 - chute;
 - passe com força máxima menor que o chute, percentual final ainda tunable;
 - spin/efeito;
 - chip/bola por cima 3D;
 - menu radial/contextual;
+- feedback de força/direção.
+
+### Goleiro
+
 - goleiro automático em competitivo oficial;
+- reação, alcance e velocidade são tuning;
+- controle manual não pode surgir silenciosamente em ruleset que define goleiro automático.
+
+### Competitivo e progressão
+
+- Liga Justa;
+- Campeonato;
 - sem pay-to-win competitivo;
+- derrota ainda pode gerar progressão/recompensa;
+- perfil persistente;
+- missões;
+- conquistas;
+- troféus/vitrine;
+- loja com estados locked / available / owned / equipped;
 - cosméticos não alteram hitbox, massa, atrito, potência ou spin competitivo.
 
 ---
 
-## 5. OPEN-001 — resolvida e LOCKED
+## 6. OPEN-001 — resolvida e LOCKED
 
 Decisão do Product Owner em 2026-08-14:
 
@@ -180,7 +258,7 @@ Não foram congelados:
 
 ---
 
-## 6. Decisões ainda abertas
+## 7. Decisões ainda abertas
 
 ### OPEN-002 — bola fora e reposições
 
@@ -213,7 +291,7 @@ Ainda requer spike de fidelidade entre UI Toolkit, uGUI ou combinação controla
 
 ---
 
-## 7. BFC Classic Simulation — direção registrada
+## 8. BFC Classic Simulation — direção registrada
 
 Issue oficial: **#7 — `Specify BFC Classic Simulation mode`**.
 
@@ -251,18 +329,33 @@ Goleiro no Classic:
 - não existe autorização para movimento manual contínuo;
 - situações exatas dependem das futuras decisões de restart/falta/pênalti.
 
+Conceito futuro:
+
+```text
+GoalkeeperPlacementWindow
+- Team
+- AllowedArea
+- MaxDisplacement
+- CanRotate
+- TimeLimit
+- ConfirmationRequired
+```
+
 A especificação do **Classic Strike Model** deve ser preparada antes ou durante a Fase 5, sem antecipar OPEN-002/003.
 
 ---
 
-## 8. Histórico de fases e merges
+## 9. Histórico de fases e merges
 
 ### Fase 0 — Foundation & Governance
 
 **Status:** concluída e mesclada.
 
 - PR #1 — `Establish BFC Unity foundation and governance`;
-- merge SHA: `ae3a87236bf1b0742bb98e131fbd4729909c2724`.
+- merge SHA: `ae3a87236bf1b0742bb98e131fbd4729909c2724`;
+- documentos normativos, arquitetura, governança, PR template, CODEOWNERS e baseline Unity estabelecidos.
+
+PR #2 foi noop/acidental e foi fechado sem efeito de produto.
 
 ### Fase 1 — Unity Bootstrap
 
@@ -270,6 +363,8 @@ A especificação do **Classic Strike Model** deve ser preparada antes ou durant
 
 - PR #3 — `Implement Phase 1 Unity bootstrap`;
 - merge SHA: `408a4b1f281b025d991c76303c83f63d6e514672`;
+- Unity abre/compila;
+- URP/Input System ativos;
 - EditMode **2/2**;
 - PlayMode **1/1**;
 - Windows x64 build e smoke test aprovados;
@@ -281,6 +376,7 @@ A especificação do **Classic Strike Model** deve ser preparada antes ou durant
 
 - PR #4 — `Implement Phase 2 physics vertical slice`;
 - merge SHA: `43c3f0961805ce177a770d73d56e337fe9b469ae`;
+- drag/release, potência, peça→bola, peça→peça, peça→parede, desaceleração, repouso, parâmetros centralizados e fixed-step;
 - EditMode **5/5**;
 - PlayMode **1/1**;
 - CI final verde.
@@ -297,10 +393,12 @@ Caveats preservados:
 
 - PR #5 — `Implement Phase 3 match core`;
 - merge SHA: `c6d636a2ce93461b8034c17db6a01c8518e65ea4`;
-- MatchState/fases/posse/comandos/validação/resolução física/contador de ações/score/restart/relógio/eventos/fim explícito;
+- `MatchState`, fases, posse, `PlayerActionCommand`, validação, `ResolvingAction`, espera por resolução física, contador/limite de ações vindo do ruleset, score, gol, `AwaitingRestart`, `ResumeAfterRestart(nextPossession)`, relógio lógico, eventos e fim explícito;
 - 8 testes próprios do MatchController;
 - EditMode total **13/13**;
 - PlayMode **1/1**;
+- metadata revisada;
+- CI verde;
 - OPEN-002/003 não decididas.
 
 ### Fase 4 — Formation & Field
@@ -315,7 +413,8 @@ Caveats preservados:
 - adicionou `PieceRole`, `TeamCompositionDefinition`, `LargeFieldEleven`, `FormationSlot`, `FormationDefinition`, `FieldDefinition`, `FormationSpawn`, `FormationSpawnPlanner`, RFC-0001 e ADR-0003;
 - EditMode **21/21**;
 - PlayMode **1/1**;
-- metadata revisada e CI verde.
+- 10 `.meta` revisados;
+- Governance/Unity Structure verdes.
 
 #### Fatia 2 — runtime materialization
 
@@ -324,6 +423,7 @@ Caveats preservados:
 - `FormationLab` materializa campo, marcações, áreas, gols, volumes de gol, bola, Team A e Team B;
 - 22 peças = 11 por equipe;
 - 20 outfield + 2 goleiros;
+- papel explícito via `FormationPieceRuntime`;
 - spawns derivados de `FormationSpawnPlanner`;
 - `PlanarKineticBody` em peças e bola;
 - root físico das peças em escala unitária e visual cilíndrico em filho escalado.
@@ -336,7 +436,8 @@ Validação real:
 - PlayMode **2/2**;
 - inspeção visual aprovada;
 - 11 peças por lado, goleiros, bola, áreas e gols visíveis;
-- metadata revisada;
+- sem erro/warning visível na evidência do FormationLab;
+- 6 `.meta` revisados;
 - CI verde.
 
 Preview da Fase 4:
@@ -344,6 +445,8 @@ Preview da Fase 4:
 - 10 outfield + 1 GK por equipe;
 - campo de preview 28×18;
 - layout e dimensões **não normativos**.
+
+`FormationLab` permanece fora do build de produção. `Bootstrap` é a entrada de produção.
 
 #### Fatia 3 — Windows performance gate / PR #10
 
@@ -363,6 +466,16 @@ Defeitos player-only encontrados e corrigidos durante validação real:
 1. `Shader.Find("Universal Render Pipeline/Lit")` / fallback `Standard` não garantiam shader utilizável após stripping;
 2. `RenderPipelineAsset.defaultMaterial` também não forneceu material utilizável no dedicated standalone;
 3. solução final: material URP Lit temporário em `Resources` durante o build diagnóstico, carregado pelo FormationLab e removido após o build.
+
+Erros observados durante as tentativas:
+
+```text
+InvalidOperationException: FormationLab could not resolve a runtime material shader.
+```
+
+```text
+InvalidOperationException: FormationLab could not resolve the active render pipeline default material.
+```
 
 Cleanup confirmado:
 
@@ -408,6 +521,7 @@ Metadata do probe:
 
 ```text
 Assets/BFC/FormationLab/FormationLabPerformanceProbe.cs.meta
+fileFormatVersion: 2
 guid: b9bed3d5a30ce2249be94c1bc153064d
 ```
 
@@ -415,6 +529,7 @@ Validação do GUID:
 
 - 32 caracteres hexadecimais;
 - ocorrência única em `Assets/`;
+- `git diff --cached --check` sem saída antes do commit;
 - commit `f5e854b`.
 
 Decisão formal do Product Owner:
@@ -443,7 +558,7 @@ Importante: os testes Unity reais e a captura Windows foram executados antes dos
 
 ---
 
-## 9. PR #9 — continuidade operacional
+## 10. PR #9 — continuidade operacional
 
 PR #9 — `Add project continuity handoff and refresh phase status` foi mesclado em:
 
@@ -455,7 +570,7 @@ Ele introduziu o documento de continuidade no repositório e atualizou os status
 
 ---
 
-## 10. Estado atual do repositório
+## 11. Estado atual do repositório
 
 Após o merge do PR #10, o Product Owner executou:
 
@@ -490,7 +605,7 @@ Situação funcional:
 
 ---
 
-## 11. FormationLab — arquivos centrais
+## 12. FormationLab — arquivos centrais
 
 ```text
 Assets/BFC/FormationLab/
@@ -518,9 +633,9 @@ O `FormationLab` é harness de engenharia, não tela final nem fonte normativa d
 
 ---
 
-## 12. Processo padrão de desenvolvimento
+## 13. Processo padrão de desenvolvimento
 
-Antes de uma nova fatia/fase:
+### Antes de uma nova fatia/fase
 
 ```powershell
 cd F:\Projetos\BFC
@@ -539,7 +654,20 @@ Depois:
 - documentar objetivo e não-decisões;
 - não decidir OPEN fora do escopo.
 
-Validação Unity padrão:
+### Durante implementação
+
+- código em inglês;
+- docs de produto/arquitetura em português;
+- regras fora de MonoBehaviour quando possível;
+- dependências explícitas;
+- parâmetros centralizados;
+- testes junto das regras;
+- sem números mágicos duplicados;
+- UI não autoritativa;
+- Physics não autoritativo para competição;
+- IA usa comandos válidos.
+
+### Validação Unity
 
 ```powershell
 .\scripts\run-unity-tests.ps1
@@ -551,15 +679,24 @@ Validador estrutural:
 python .\scripts\validate_unity_structure.py
 ```
 
+### Metadata `.meta`
+
 Para novos `.meta`:
 
 1. deixar Unity gerar;
 2. verificar GUID não vazio e único;
 3. fazer stage;
 4. executar `git diff --cached --check`;
-5. não modificar metadata manualmente sem necessidade objetiva.
+5. não modificar metadata manualmente sem necessidade objetiva;
+6. quando necessário, conferir problemas fora de `.meta` com:
 
-Antes de considerar PR pronto, quando aplicável:
+```powershell
+git diff --cached --check -- . ':(exclude)*.meta'
+```
+
+### PR pronto
+
+Quando aplicável, exigir:
 
 - Unity real compila;
 - EditMode verde;
@@ -588,7 +725,26 @@ Quando autorizado:
 
 ---
 
-## 13. Caveats que não podem ser perdidos
+## 14. CI e proteção de `main`
+
+`main` é protegida para fluxo por PR.
+
+- PR obrigatório;
+- `Governance` obrigatório;
+- `Unity Structure` obrigatório;
+- force push/deleção de `main` bloqueados.
+
+Regra operacional importante:
+
+```text
+static CI green != runtime/Unity validation complete
+```
+
+O FormationLab já demonstrou esse ponto: CI estático verde não detectou erros que a execução real da Unity encontrou.
+
+---
+
+## 15. Caveats que não podem ser perdidos
 
 - `PhysicsLabTuning` é provisório;
 - collision detection `Discrete` no laboratório não é regra final de produção;
@@ -608,11 +764,14 @@ Quando autorizado:
 - não transformar `avgFps=2359.451` em requisito de produção;
 - preservar `maxMs=275.347` como outlier real da captura;
 - `Shader.Find` isolado não foi suficiente para garantir material do standalone FormationLab;
+- `RenderPipelineAsset.defaultMaterial` também não resolveu o dedicated player;
 - FormationLab continua fora do player build de produção.
 
 ---
 
-## 14. Fase 5 — Advanced Actions
+## 16. Próximas fases
+
+### Fase 5 — Advanced Actions
 
 Próximo milestone técnico.
 
@@ -641,9 +800,36 @@ Direção de implementação:
 - manter Modern Control e Classic Simulation separados;
 - não antecipar decisões de OPEN-002/003.
 
+### Fase 6 — Goalkeeper & AI
+
+- goleiro automático;
+- percepção;
+- seleção de peça;
+- shot planner;
+- força/direção;
+- dificuldade;
+- limite de decisão;
+- fallback válido;
+- sem deadlock.
+
+### Fase 7 — Rules & Restarts
+
+Depende de OPEN-002/003.
+
+### Fases 8–15
+
+- Modes;
+- Progression/Economy/Save;
+- Official Interface & Menu;
+- Match Presentation;
+- Audio & Feel;
+- Windows Production Build;
+- Optimization/RC;
+- Secondary Platforms.
+
 ---
 
-## 15. Próximo passo seguro
+## 17. Próximo passo seguro
 
 1. concluir esta atualização documental pós-merge em PR pequeno e isolado;
 2. validar diff e CI dessa branch documental;
@@ -657,7 +843,52 @@ Direção de implementação:
 
 ---
 
-## 16. Referências principais
+## 18. Protocolo obrigatório de atualização deste documento
+
+Atualizar este arquivo sempre que uma etapa/fase relevante for concluída.
+
+Registrar:
+
+- data/hora;
+- branch/PR;
+- head conhecido;
+- merge SHA quando existir;
+- testes realmente executados;
+- CI;
+- build;
+- inspeções;
+- metadata;
+- decisões do Product Owner;
+- bugs encontrados e correções;
+- OPEN DECISIONS afetadas;
+- caveats;
+- próximo passo.
+
+Nunca registrar como concluído algo que ainda depende de evidência futura.
+
+---
+
+## 19. Checklist de handoff
+
+Antes de abandonar uma conversa longa:
+
+- [x] contexto de produto preservado;
+- [x] arquitetura preservada;
+- [x] decisões LOCKED registradas;
+- [x] OPEN DECISIONS registradas;
+- [x] histórico das Fases 0–4 registrado;
+- [x] testes mais recentes registrados;
+- [x] performance Windows registrada;
+- [x] defeitos standalone e solução registrados;
+- [x] metadata final da Fase 4 registrada;
+- [x] decisão de encerramento da Fase 4 registrada;
+- [x] merge SHA do PR #10 registrado;
+- [x] regra de autorização de merge registrada;
+- [x] próximo passo explícito.
+
+---
+
+## 20. Referências principais
 
 ```text
 docs/00-PRODUCT_CHARTER.md
@@ -703,7 +934,7 @@ PRs/merges principais:
 
 ---
 
-## 17. Resumo de 30 segundos
+## 21. Resumo de 30 segundos
 
 ```text
 Projeto: BFC em Unity 6.3 LTS / 6000.3.21f1.
