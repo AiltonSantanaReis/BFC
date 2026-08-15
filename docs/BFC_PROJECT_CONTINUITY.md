@@ -8,10 +8,10 @@
 **HEAD conhecido de `main`:** `eb62dc4f93526685e41ab22a96aa591fa465c3c8` — PR #9  
 **Branch de trabalho atual:** `agent/phase4-final-gate`  
 **PR atual:** #10 — `Implement Phase 4 Windows performance gate`  
-**Estado do PR #10:** Draft no momento desta edição, aberto e não mesclado. O head `8f8c1658514f3def9743800394fda6bf7e1dbc84` concluiu `Governance` e `Unity Structure` com `success`, portanto o PR pode ser marcado Ready for review. Merge exige autorização explícita do Product Owner.  
+**Estado do PR #10:** Draft no momento desta edição, aberto e não mesclado. O head `2718acd4b86dfed1144115d2d8b83d718a5f8975` concluiu `Governance` e `Unity Structure` com `success`; o PR está apto a ser marcado Ready for review. Merge exige autorização explícita do Product Owner.  
 **Estado da Fase 4:** escopo e validação real **CONCLUÍDOS**; encerramento explicitamente autorizado pelo Product Owner.  
 **Último HEAD local informado pelo Product Owner antes das atualizações documentais remotas:** `f5e854b` com working tree limpa.  
-**Head validado por CI imediatamente antes desta edição:** `8f8c1658514f3def9743800394fda6bf7e1dbc84`. Esta edição cria um commit posterior, portanto o head exato deve sempre ser conferido novamente antes do merge.
+**Head validado por CI imediatamente antes desta edição:** `2718acd4b86dfed1144115d2d8b83d718a5f8975`. Esta edição cria um commit posterior, portanto o head exato deve sempre ser conferido novamente antes do merge.
 
 > Este é o handoff operacional oficial do BFC. Ele existe para permitir retomar o projeto em uma nova conversa sem depender do histórico anterior.
 >
@@ -685,7 +685,7 @@ Consequência:
 Head validado imediatamente antes desta edição:
 
 ```text
-8f8c1658514f3def9743800394fda6bf7e1dbc84
+2718acd4b86dfed1144115d2d8b83d718a5f8975
 ```
 
 Resultados:
@@ -742,9 +742,10 @@ f5e854b  materialize FormationLab performance probe metadata
 4151bbe  record exact final Phase 4 documentation head
 fe178fb  finalize Phase 4 closure status
 8f8c165  record green current Phase 4 head
+2718acd  prepare continuity for PR review state
 ```
 
-Esta própria atualização cria um commit posterior a `8f8c165`. **Sempre verificar o head atual do PR #10 no GitHub antes de qualquer merge** e usar o SHA retornado naquele momento como `expected_head_sha`.
+Esta própria atualização cria um commit posterior a `2718acd`. **Sempre verificar o head atual do PR #10 no GitHub antes de qualquer merge** e usar o SHA retornado naquele momento como `expected_head_sha`.
 
 ### Situação local do Product Owner
 
