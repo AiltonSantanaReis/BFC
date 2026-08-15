@@ -1,6 +1,6 @@
 # BFC Phase 4 — Formation & Field
 
-Status: **ACTIVE — DOMAIN SLICE VALIDATED / RUNTIME MATERIALIZATION IMPLEMENTED, UNITY VALIDATION PENDING**
+Status: **ACTIVE — DOMAIN + RUNTIME SLICES VALIDATED / MERGED; FINAL PHASE GATE STILL OPEN**
 
 ## Objetivo
 
@@ -24,7 +24,7 @@ Registros:
 - `docs/decisions/ADR-0003-mode-specific-formation-profiles.md`;
 - `OPEN-001` está `locked` no registro de governança.
 
-## Primeira fatia — domínio validado
+## Primeira fatia — domínio validado e mesclado
 
 ### Composição de equipe
 
@@ -57,9 +57,22 @@ As dimensões finais de produção continuam sendo dados de conteúdo/tuning; es
 
 `FormationSpawnPlanner` converte slots normalizados em coordenadas XZ respeitando margem de segurança e espelha longitudinalmente a mesma formação para Team A e Team B.
 
-A primeira fatia foi validada no Unity 6000.3.21f1 com EditMode 21/21, PlayMode 1/1, metadados Unity revisados e CI de Governance/Unity Structure verde antes do merge.
+### Validação da primeira fatia
 
-## Segunda fatia — materialização de runtime
+Validada no Unity 6000.3.21f1 antes do merge:
+
+- EditMode: **21/21 passed**;
+- PlayMode: **1/1 passed**;
+- 10 `.meta` gerados pelo Unity revisados e commitados;
+- CI `Governance` verde;
+- CI `Unity Structure` verde.
+
+Merge:
+
+- PR #6: `[GOVERNANCE CHANGE] Implement Phase 4 formation and field`;
+- merge por squash: `6b80ee5bfe65d9fb183c9f05db175b864db005e9`.
+
+## Segunda fatia — materialização de runtime validada e mesclada
 
 Foi criado um harness dedicado `FormationLab` que consome as definições de domínio em vez de duplicar contagem e posicionamento na cena.
 
@@ -76,7 +89,36 @@ A materialização atual cria em runtime:
 
 `FormationLabPreviewProfiles` fornece um campo e uma formação balanceada apenas para visualização e testes da Fase 4. As dimensões `28 x 18` e o layout usado no preview são **não normativos** e não congelam tamanho oficial nem uma formação tática obrigatória.
 
-A cena `Assets/BFC/Scenes/FormationLab.unity` permanece como laboratório de desenvolvimento e fica desabilitada no build settings; o `Bootstrap` continua sendo a única cena de entrada habilitada.
+A cena `Assets/BFC/Scenes/FormationLab.unity` é laboratório de desenvolvimento e permanece **fora do player build**. `Bootstrap` continua sendo a entrada de produção. A serialização real do Unity 6000.3.21f1 para `EditorBuildSettings.asset` foi aceita e o validador estrutural foi ajustado para exigir essa separação.
+
+### Problemas encontrados pela validação real
+
+A primeira execução no Unity detectou erros que o CI estático não havia detectado:
+
+- dependência desnecessária de `AudioListener` em um assembly que não precisava do módulo de áudio;
+- uso de `FormationSpawn.SlotId`, embora o contrato correto exponha `PieceId`.
+
+A correção foi feita no commit `6ab8355` e revalidada no Unity.
+
+### Validação final da segunda fatia
+
+Em Unity 6000.3.21f1:
+
+- importação/compilação concluída sem os erros anteriores;
+- EditMode: **21/21 passed**;
+- PlayMode: **2/2 passed**;
+- smoke test confirma 22 peças de formação, 2 goleiros, 20 peças de linha, roots em escala unitária e 23 corpos físicos incluindo a bola;
+- inspeção manual do `FormationLab` aprovada: campo inteiro enquadrado, 11 peças de cada lado, goleiros, bola, áreas e gols visíveis;
+- Console da evidência do FormationLab sem erro/warning visível;
+- 6 novos `.meta` revisados, com GUIDs presentes e únicos;
+- metadata commitada em `0be852b`;
+- CI `Governance` verde no head final;
+- CI `Unity Structure` verde no head final.
+
+Merge:
+
+- PR #8: `Implement Phase 4 runtime field materialization`;
+- merge por squash: `5ab0db9583aad4c7695dea1aeeb8863208dcfec1`.
 
 ## Restrições de arquitetura
 
@@ -109,17 +151,28 @@ A resolução de `OPEN-001` e o preview de runtime não escolhem silenciosamente
 - [x] goleiro identificado como função distinta;
 - [x] definição lógica configurável de campo;
 - [x] planejamento de spawn espelhado e com margem segura;
-- [x] primeira fatia validada no Unity 6000.3.21f1;
+- [x] primeira fatia validada no Unity 6000.3.21f1 e mesclada;
 - [x] integração visual/física implementada em `FormationLab`;
-- [x] PlayMode smoke test para 22 peças, 2 goleiros e 1 bola implementado;
-- [ ] Unity 6000.3.21f1 importa/compila a segunda fatia sem erros;
-- [ ] EditMode existente permanece 21/21 ou melhor;
-- [ ] PlayMode inclui e aprova o novo smoke test;
-- [ ] novos `.meta` gerados pelo Unity são revisados e commitados;
-- [ ] inspeção manual do FormationLab confirma campo, 22 peças, 2 goleiros, bola e gols visíveis;
-- [ ] performance do preview não apresenta regressão evidente no target Windows;
-- [ ] CI Governance e Unity Structure verdes no head final.
+- [x] PlayMode smoke test para 22 peças, 2 goleiros e 1 bola implementado e aprovado;
+- [x] Unity 6000.3.21f1 importa/compila a segunda fatia após as correções;
+- [x] EditMode permanece **21/21**;
+- [x] PlayMode passa **2/2**;
+- [x] novos `.meta` gerados pelo Unity revisados e commitados;
+- [x] inspeção manual do FormationLab confirma campo, 22 peças, 2 goleiros, bola e gols visíveis;
+- [x] CI Governance e Unity Structure verdes no head final da segunda fatia;
+- [ ] registrar evidência objetiva suficiente de performance estável do preview no target Windows;
+- [ ] decidir explicitamente se o gate da Fase 4 exige uma fatia adicional de integração com o fluxo de partida ou perfis adicionais de campo/formação antes de encerrar a fase.
 
-## Próxima decisão após esta fatia
+## Estado da fase após PR #8
 
-Depois de validar o FormationLab, a Fase 4 pode avançar para perfis adicionais de campo/formação e integração gradual com fluxo de partida. O `BFC Classic Simulation` permanece registrado separadamente para especificação do modelo de golpe antes/durante a Fase 5, sem interromper esta fundação.
+As duas primeiras fatias da Fase 4 estão concluídas e mescladas. A fase permanece **ACTIVE** porque o plano normativo exige performance estável no target Windows e ainda deve haver uma decisão explícita sobre a suficiência do escopo atual para fechar o gate completo.
+
+Não iniciar silenciosamente a Fase 5 como se a Fase 4 já estivesse encerrada.
+
+## Próximo passo
+
+- capturar evidência mínima e objetiva de performance do FormationLab em Windows;
+- revisar se materialização + testes atuais já satisfazem o requisito de campo/formação jogável ou se falta integração adicional com o Match Core;
+- decidir se perfis adicionais precisam ser materializados antes do gate;
+- quando o Product Owner aprovar o fechamento, atualizar status/documentação da Fase 4 para concluída;
+- preparar a especificação do `BFC Classic Simulation` / Classic Strike Model antes ou durante a Fase 5, sem antecipar decisões de `OPEN-002`/`OPEN-003`.
