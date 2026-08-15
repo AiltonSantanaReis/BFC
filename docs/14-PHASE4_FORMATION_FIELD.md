@@ -1,6 +1,6 @@
 # BFC Phase 4 — Formation & Field
 
-Status: **ACTIVE — DOMAIN + RUNTIME SLICES VALIDATED / MERGED; FINAL PHASE GATE STILL OPEN**
+Status: **COMPLETE — PRODUCT OWNER CLOSURE APPROVED; PR #10 PENDING FINAL CI / MERGE**
 
 ## Objetivo
 
@@ -159,6 +159,15 @@ Na mesma revisão do head `96464f0`:
 - EditMode: **21/21 passed**;
 - PlayMode: **2/2 passed**.
 
+O novo `FormationLabPerformanceProbe.cs.meta` também foi revisado e versionado:
+
+- GUID: `b9bed3d5a30ce2249be94c1bc153064d`;
+- formato: 32 dígitos hexadecimais;
+- ocorrência sob `Assets/`: única;
+- `git diff --cached --check`: sem erro;
+- commit local/push: `f5e854b` (`materialize FormationLab performance probe metadata`);
+- working tree local informado após o push: limpa.
+
 ## Restrições de arquitetura
 
 - nenhum número de peças pode ficar hardcoded em lógica central de partida;
@@ -200,22 +209,23 @@ A resolução de `OPEN-001` e o preview de runtime não escolhem silenciosamente
 - [x] inspeção manual do FormationLab confirma campo, 22 peças, 2 goleiros, bola e gols visíveis;
 - [x] CI Governance e Unity Structure verdes no head final da segunda fatia;
 - [x] evidência objetiva de performance do preview capturada com sucesso no target Windows;
-- [ ] revisar e versionar o `.meta` do novo `FormationLabPerformanceProbe.cs`;
-- [ ] Product Owner decidir explicitamente se o escopo atual satisfaz o gate completo ou se exige uma fatia adicional de integração/perfis antes de encerrar a fase;
-- [ ] validar CI no head final após metadata/documentação.
+- [x] `.meta` do novo `FormationLabPerformanceProbe.cs` revisado e versionado;
+- [x] Product Owner decidiu explicitamente que o escopo atual satisfaz o gate completo, sem fatia adicional de Match Core/perfis nesta fase;
+- [ ] validar CI no head final do PR #10 após esta atualização documental.
 
-## Estado atual
+## Decisão de encerramento da Fase 4
 
-O requisito de performance estável do preview no target Windows possui agora evidência objetiva no escopo atual. A Fase 4 permanece formalmente **ACTIVE** somente porque ainda faltam consolidar o `.meta` do novo probe, validar o head final e registrar a decisão explícita do Product Owner sobre suficiência do escopo.
+Em 2026-08-14, o Product Owner autorizou explicitamente: **encerrar a Fase 4 com o escopo atual**.
 
-O plano normativo da Fase 4 exige campo/formação, spawn seguro, testes e performance estável; ele não lista integração com o Match Core como entrega ou gate obrigatório. Portanto, uma fatia adicional de Match Core deve existir apenas se o Product Owner decidir ampliar o escopo da fase, não como requisito implícito.
+A decisão é compatível com `docs/04-DEVELOPMENT_PLAN.md`: o gate normativo exige configuração de composição, campo/formação, spawn seguro, testes e performance estável no target Windows. Integração adicional com Match Core não aparece como entrega/gate obrigatório da Fase 4 e, portanto, não será introduzida apenas para ampliar escopo depois que o gate definido foi satisfeito.
 
-Não iniciar silenciosamente a Fase 5 enquanto esses itens finais não forem fechados.
+A Fase 4 está **concluída em escopo e validação real**. O único passo administrativo ainda pendente neste PR é obter CI verde no head documental final e então deixar o PR #10 pronto para revisão/merge. O merge continua sujeito a autorização explícita separada do Product Owner.
 
 ## Próximo passo
 
-- revisar e versionar `FormationLabPerformanceProbe.cs.meta`;
-- confirmar CI verde no head final;
-- Product Owner decidir se a Fase 4 pode ser encerrada com o escopo atual;
-- se aprovada a suficiência, atualizar status da Fase 4 para concluída e atualizar `docs/BFC_PROJECT_CONTINUITY.md` antes do merge final;
-- preparar a especificação do `BFC Classic Simulation` / Classic Strike Model antes ou durante a Fase 5, sem antecipar decisões de `OPEN-002`/`OPEN-003`.
+- obter `Governance` e `Unity Structure` verdes no head final do PR #10;
+- atualizar `docs/BFC_PROJECT_CONTINUITY.md` com o encerramento da Fase 4 e o estado pré-merge do PR #10;
+- marcar o PR #10 como Ready for review somente após esses registros estarem completos;
+- não mesclar sem autorização explícita do Product Owner;
+- após o merge, sincronizar `main` local e registrar o merge SHA no handoff;
+- iniciar a preparação da Fase 5 — Advanced Actions, incluindo a especificação do `BFC Classic Simulation` / Classic Strike Model antes ou durante a fase, sem antecipar decisões de `OPEN-002`/`OPEN-003`.
