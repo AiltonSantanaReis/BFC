@@ -1,18 +1,18 @@
 # BFC — Documento Mestre de Continuidade, Status e Handoff
 
-**Versão:** 1.2
-**Última atualização operacional:** 2026-08-15 07:20 (BRT / UTC-03:00)
-**Repositório:** `AiltonSantanaReis/BFC`  
-**Workspace local principal:** `F:\Projetos\BFC`  
-**Branch canônica:** `main`  
-**HEAD confirmado de `main`:** `68279f8b89c5ecd70d380cc83071d2c2a5dfa6cf` — merge do PR #10
-**Branch de trabalho atual:** `agent/post-phase4-continuity`
-**PR atual:** #11 — `Refresh continuity after Phase 4 merge`
-**Estado do PR #11:** Draft, documentação apenas, aberto e não mesclado. Merge exige autorização explícita do Product Owner.
+**Versão:** 1.3
+**Última atualização operacional:** 2026-08-15 12:38 (BRT / UTC-03:00)
+**Repositório:** `AiltonSantanaReis/BFC`
+**Workspace local principal:** `F:\Projetos\BFC`
+**Branch canônica:** `main`
+**Baseline estável confirmado de `main`:** `4476640cb7a08239bbd0b87ff07a1a8e7e135988` — squash merge do PR #11
+**Último merge de continuidade:** PR #11 — `Refresh continuity after Phase 4 merge`
+**Merge SHA do PR #11:** `4476640cb7a08239bbd0b87ff07a1a8e7e135988`
 **Estado da Fase 4:** **CONCLUÍDA E INTEGRADA EM `main`**.
 **Merge SHA do PR #10:** `68279f8b89c5ecd70d380cc83071d2c2a5dfa6cf`.
 **Head final do PR #10 antes do merge:** `bf0ce52196186f31145d60f7d9cd81c8600b8f44`; `Governance` e `Unity Structure` concluíram com `success`.
-**Estado local confirmado pelo Product Owner antes desta atualização:** branch `agent/post-phase4-continuity`, HEAD `68279f8b89c5ecd70d380cc83071d2c2a5dfa6cf`, working tree limpa.
+**Próximo milestone:** **Fase 5 — Advanced Actions**.
+**Política de estado transitório:** branch de trabalho, PR atual e head de trabalho devem ser conferidos diretamente no GitHub; este handoff registra baselines e merges estáveis, não o próprio PR que o atualiza.
 
 > Este é o handoff operacional oficial do BFC. Ele existe para permitir retomar o projeto em uma nova conversa sem depender do histórico anterior.
 >
@@ -727,48 +727,47 @@ Ele introduziu este documento no repositório e corrigiu status defasados das Fa
 ### `main`
 
 ```text
-HEAD confirmado: 68279f8b89c5ecd70d380cc83071d2c2a5dfa6cf
+HEAD confirmado: 4476640cb7a08239bbd0b87ff07a1a8e7e135988
 ```
 
-O PR #10 foi mesclado; o fechamento da Fase 4 está integrado em `main`.
+O PR #11 foi mesclado por squash e consolidou em `main` a continuidade documental pós-Fase 4.
 
 Após o merge, o Product Owner sincronizou localmente:
 
-```powershell
-git switch main
-git pull --ff-only
-git log -1 --oneline
-git status --short
-```
-
-Resultado:
-
 ```text
-68279f8 (HEAD -> main, origin/main, origin/HEAD) Implement Phase 4 Windows performance gate (#10)
+4476640 (HEAD -> main, origin/main, origin/HEAD) Refresh continuity after Phase 4 merge (#11)
 working tree: limpa
 ```
 
-### Branch documental pós-Fase 4
+### Continuidade pós-Fase 4 — registro histórico
+
+Branch utilizada:
 
 ```text
 agent/post-phase4-continuity
 ```
 
-Foi criada exatamente a partir de `68279f8b89c5ecd70d380cc83071d2c2a5dfa6cf` para atualizar este handoff sem misturar trabalho técnico da Fase 5.
-
-PR documental atual:
+PR:
 
 ```text
 #11 — Refresh continuity after Phase 4 merge
 ```
 
-Escopo do PR #11:
+Merge SHA:
+
+```text
+4476640cb7a08239bbd0b87ff07a1a8e7e135988
+```
+
+Escopo desse PR:
 
 - somente `docs/BFC_PROJECT_CONTINUITY.md`;
 - nenhuma alteração em código Unity/C#;
 - nenhuma alteração de regra;
 - nenhuma alteração de OPEN-002/003;
 - nenhuma alteração de build/runtime.
+
+Este registro é histórico. Branch, PR e head de trabalho correntes devem ser consultados diretamente no GitHub para evitar autorreferência transitória neste handoff.
 
 ---
 
@@ -995,7 +994,7 @@ sem apagá-lo ou reinterpretá-lo como comportamento típico.
 
 ### Fase 5 — Advanced Actions
 
-Próxima fase de implementação após o fechamento documental pós-Fase 4.
+Fase atual em preparação/implementação após o fechamento completo da Fase 4.
 
 Entregas normativas:
 
@@ -1051,26 +1050,28 @@ Depende de OPEN-002/003.
 
 ## 18. Próximo passo seguro
 
-No momento desta atualização:
+Baseline estável:
 
-1. validar o head atual do PR #11;
-2. confirmar que o diff do PR #11 contém somente `docs/BFC_PROJECT_CONTINUITY.md` e apenas atualização documental pós-merge;
-3. confirmar `Governance` e `Unity Structure` no head final do PR #11;
-4. manter PR #11 como **Draft** até a revisão ficar concluída;
-5. **não fazer merge sem autorização explícita do Product Owner**;
-6. quando autorizado, revalidar head/CI e fazer squash merge;
-7. no PC do Product Owner executar:
+- Fase 4 concluída e integrada;
+- PR #11 mesclado;
+- `main` estável em `4476640cb7a08239bbd0b87ff07a1a8e7e135988`;
+- Fase 5 — Advanced Actions é o milestone atual;
+- a especificação de engenharia da Fase 5 está em `docs/15-PHASE5_ADVANCED_ACTIONS.md`.
 
-```powershell
-git switch main
-git pull --ff-only
-git log -1 --oneline
-git status --short
-```
+Sequência segura:
 
-8. iniciar a preparação formal da Fase 5 em nova branch a partir do `main` atualizado;
-9. antes de alterar runtime, revisar Development Plan, Gameplay Constitution, Architecture e issue #7;
-10. especificar arquitetura/contratos das Advanced Actions e do Classic Strike Model sem antecipar OPEN-002/003.
+1. conferir no GitHub o `main`, PRs abertos e issues relevantes antes de cada nova fatia;
+2. usar `docs/15-PHASE5_ADVANCED_ACTIONS.md` como contrato de engenharia da Fase 5;
+3. concluir especificação, continuidade e contratos puros antes de ampliar runtime;
+4. implementar tipos puros de ação, elegibilidade e testes de regra;
+5. implementar a bridge Gameplay → Physics e primitives físicas necessárias;
+6. integrar Modern Control sem mover regra autoritativa para Input ou Presentation;
+7. implementar radial/contextual funcional e feedback;
+8. abordar Classic Strike Model experimental somente após os contratos modernos estarem estáveis;
+9. não resolver `OPEN-002`, `OPEN-003`, `OPEN-004` ou `OPEN-005` silenciosamente;
+10. não mesclar nenhum PR sem autorização explícita do Product Owner.
+
+Branch, PR e head de trabalho correntes não são congelados neste documento; devem ser consultados no GitHub.
 
 ---
 
@@ -1114,6 +1115,7 @@ Antes de abandonar uma conversa longa:
 - [x] metadata final da Fase 4 registrada;
 - [x] decisão de encerramento da Fase 4 registrada;
 - [x] merge SHA do PR #10 registrado: `68279f8b89c5ecd70d380cc83071d2c2a5dfa6cf`;
+- [x] merge SHA do PR #11 registrado: `4476640cb7a08239bbd0b87ff07a1a8e7e135988`;
 - [x] regra de autorização de merge registrada;
 - [x] próximo passo explícito.
 
@@ -1132,6 +1134,7 @@ docs/10-CODING-STANDARDS.md
 docs/OPEN_DECISIONS.md
 docs/13-PHASE3_MATCH_CORE.md
 docs/14-PHASE4_FORMATION_FIELD.md
+docs/15-PHASE5_ADVANCED_ACTIONS.md
 docs/BFC_PROJECT_CONTINUITY.md
 
 docs/changes/RFC-0001-phase4-team-composition.md
@@ -1161,7 +1164,7 @@ PRs/merges conhecidos:
 #8 Phase 4 Runtime          -> 5ab0db9583aad4c7695dea1aeeb8863208dcfec1
 #9 Continuity handoff       -> eb62dc4f93526685e41ab22a96aa591fa465c3c8
 #10 Phase 4 final gate      -> 68279f8b89c5ecd70d380cc83071d2c2a5dfa6cf
-#11 Post-Phase 4 continuity -> OPEN / DRAFT / DOCUMENTATION ONLY
+#11 Post-Phase 4 continuity -> 4476640cb7a08239bbd0b87ff07a1a8e7e135988
 ```
 
 ---
@@ -1174,15 +1177,18 @@ Referência funcional: BFC legado.
 Referência visual: Interface e Menu.
 Windows primeiro.
 Fases 0, 1, 2, 3 e 4 concluídas e integradas.
-main confirmado = 68279f8b89c5ecd70d380cc83071d2c2a5dfa6cf.
-PR #10 foi mesclado por squash e encerrou formalmente a Fase 4.
+main estável = 4476640cb7a08239bbd0b87ff07a1a8e7e135988.
+PR #10 encerrou formalmente a Fase 4.
+PR #11 consolidou o handoff pós-Fase 4.
 Campo grande = 11 total por time = 10 linha + 1 goleiro.
 FormationLab: EditMode 21/21; PlayMode 2/2; inspeção visual aprovada.
 Windows performance: 23595 samples, avg 0.424ms, p95 0.527ms, p99 1.012ms, max 275.347ms.
 Performance numbers são evidência de harness, não requisito de produção.
 OPEN-002/003 continuam abertas.
-Classic Simulation está na issue #7 e precisa de Classic Strike Model antes/durante a Fase 5.
-PR #11 é apenas a atualização documental pós-merge da Fase 4.
+Fase atual: Phase 5 — Advanced Actions.
+Especificação: docs/15-PHASE5_ADVANCED_ACTIONS.md.
+Classic Simulation permanece separada do Modern Control.
+Classic Strike Model deve ser desenvolvido sem antecipar OPEN-002/003.
 Nenhum merge sem autorização explícita do Product Owner.
-Próximo: concluir PR #11 -> sincronizar main -> preparar especificação/arquitetura da Fase 5.
+Branch/PR/head correntes devem ser consultados diretamente no GitHub.
 ```
