@@ -11,7 +11,7 @@
 **Estado do PR #10:** Draft, aberto, não mesclado; merge exige autorização explícita do Product Owner.  
 **Estado da Fase 4:** escopo e validação real **CONCLUÍDOS**; encerramento explicitamente autorizado pelo Product Owner; resta o fechamento administrativo do PR #10 (CI final, Ready for review e merge autorizado).  
 **HEAD local informado pelo Product Owner antes das atualizações documentais remotas finais:** `f5e854b` com working tree limpa.  
-**HEAD remoto imediatamente antes desta atualização de continuidade:** `3a10c720af26a53e7e1fd75624cec76a04a1f863`.
+**HEAD remoto verificado do PR #10 após a primeira atualização deste handoff:** `14bb6239f183e83dc9bb7aa47ceb84100d770913`; esta própria atualização documental cria um commit posterior, portanto o head exato deve sempre ser conferido no GitHub antes do merge.
 
 > Este é o handoff operacional oficial do BFC. Ele existe para permitir retomar o projeto em uma nova conversa sem depender do histórico anterior.
 >
@@ -716,20 +716,15 @@ O PR #10 ainda não foi mesclado, portanto o fechamento da Fase 4 ainda não est
 
 ### Branch do PR #10
 
-Antes das atualizações documentais finais remotas:
+Sequência recente conhecida:
 
 ```text
-commit de metadata: f5e854b
-working tree local do Product Owner: limpa
+f5e854b  materialize FormationLab performance probe metadata
+3a10c720 close Phase 4 formation and field gate
+14bb6239 update continuity for Phase 4 closure
 ```
 
-Depois do push da metadata, a documentação da Fase 4 foi atualizada remotamente, avançando a branch para:
-
-```text
-3a10c720af26a53e7e1fd75624cec76a04a1f863
-```
-
-Esta atualização do próprio handoff avançará novamente o head. Portanto, **sempre verificar o head atual do PR #10 no GitHub antes de qualquer merge**; não usar `f5e854b` ou `3a10c720` como expected head depois desta atualização.
+Esta própria atualização cria um commit posterior a `14bb6239`. **Sempre verificar o head atual do PR #10 no GitHub antes de qualquer merge** e usar o SHA retornado naquele momento como `expected_head_sha`.
 
 ### Situação local do Product Owner
 
@@ -1026,7 +1021,7 @@ Depende de OPEN-002/003.
 
 No momento desta atualização:
 
-1. confirmar que o PR #10 está no novo head documental final;
+1. confirmar o novo head exato do PR #10;
 2. aguardar/confirmar `Governance` e `Unity Structure` verdes nesse head;
 3. se ambos verdes, marcar PR #10 como **Ready for review**;
 4. **não fazer merge ainda**;
@@ -1100,7 +1095,7 @@ docs/02-VISUAL_CONSTITUTION.md
 docs/03-ARCHITECTURE.md
 docs/04-DEVELOPMENT_PLAN.md
 docs/05-CHANGE_CONTROL.md
-docs/10-CODING_STANDARDS.md
+docs/10-CODING-STANDARDS.md
 docs/OPEN_DECISIONS.md
 docs/13-PHASE3_MATCH_CORE.md
 docs/14-PHASE4_FORMATION_FIELD.md
