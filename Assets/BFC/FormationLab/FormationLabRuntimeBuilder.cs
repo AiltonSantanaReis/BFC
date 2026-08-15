@@ -15,6 +15,7 @@ namespace BFC.FormationLab
         public const string FieldSurfaceName = "Field Surface";
         public const string BallName = "Ball";
 
+        private const string RuntimeMaterialResourceName = "BFCFormationLabRuntimeMaterial";
         private const float SurfaceThickness = 0.16f;
         private const float MarkingThickness = 0.045f;
         private const float GoalHeight = 0.95f;
@@ -347,17 +348,40 @@ namespace BFC.FormationLab
 
         private static Material CreateMaterial(Color color)
         {
-            RenderPipelineAsset pipeline = GraphicsSettings.currentRenderPipeline;
-            if (pipeline == null)
+            Material template = Resources.Load<Material>(RuntimeMaterialResourceName);
+
+            if (template == null)
             {
-                pipeline = GraphicsSettings.defaultRenderPipeline;
+                RenderPipelineAsset pipeline = GraphicsSettings.currentRenderPipeline;
+                if (pipeline == null)
+                {
+                    pipeline = GraphicsSettings.defaultRenderPipeline;
+                }
+
+                template = pipeline != null ? pipeline.defaultMaterial : null;
             }
 
-            Material template = pipeline != null ? pipeline.defaultMaterial : null;
+            if (template == null)
+            {
+                Shader shader = Shader.Find("Universal Render Pipeline/Lit");
+                if (shader == null)
+                {
+                    shader = Shader.Find("Standard");
+                }
+
+                if (shader != null)
+                {
+                    template = new Material(shader)
+                    {
+                        hideFlags = HideFlags.DontSave
+                    };
+                }
+            }
+
             if (template == null)
             {
                 throw new InvalidOperationException(
-                    "FormationLab could not resolve the active render pipeline default material.");
+                    "FormationLab could not resolve a runtime material template.");
             }
 
             Material material = new Material(template)
