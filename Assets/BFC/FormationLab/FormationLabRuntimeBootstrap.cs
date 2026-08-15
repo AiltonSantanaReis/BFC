@@ -28,6 +28,12 @@ namespace BFC.FormationLab
         private void Awake()
         {
             FormationLabRuntimeBuilder.Build(transform);
+
+            if (FormationLabPerformanceProbe.IsRequested() &&
+                GetComponent<FormationLabPerformanceProbe>() == null)
+            {
+                gameObject.AddComponent<FormationLabPerformanceProbe>();
+            }
         }
     }
 }
