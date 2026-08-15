@@ -211,7 +211,7 @@ A resolução de `OPEN-001` e o preview de runtime não escolhem silenciosamente
 - [x] evidência objetiva de performance do preview capturada com sucesso no target Windows;
 - [x] `.meta` do novo `FormationLabPerformanceProbe.cs` revisado e versionado;
 - [x] Product Owner decidiu explicitamente que o escopo atual satisfaz o gate completo, sem fatia adicional de Match Core/perfis nesta fase;
-- [ ] validar CI no head final do PR #10 após esta atualização documental.
+- [ ] validar CI no head final do PR #10 após as atualizações documentais finais.
 
 ## Decisão de encerramento da Fase 4
 
@@ -224,8 +224,7 @@ A Fase 4 está **concluída em escopo e validação real**. O único passo admin
 ## Próximo passo
 
 - obter `Governance` e `Unity Structure` verdes no head final do PR #10;
-- atualizar `docs/BFC_PROJECT_CONTINUITY.md` com o encerramento da Fase 4 e o estado pré-merge do PR #10;
-- marcar o PR #10 como Ready for review somente após esses registros estarem completos;
+- marcar o PR #10 como Ready for review somente após esses checks concluírem;
 - não mesclar sem autorização explícita do Product Owner;
 - após o merge, sincronizar `main` local e registrar o merge SHA no handoff;
 - iniciar a preparação da Fase 5 — Advanced Actions, incluindo a especificação do `BFC Classic Simulation` / Classic Strike Model antes ou durante a fase, sem antecipar decisões de `OPEN-002`/`OPEN-003`.
