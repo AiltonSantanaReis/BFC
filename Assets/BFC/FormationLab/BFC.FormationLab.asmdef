@@ -3,7 +3,9 @@
   "rootNamespace": "BFC.FormationLab",
   "references": [
     "BFC.Core",
-    "BFC.Physics"
+    "BFC.Physics",
+    "BFC.Gameplay",
+    "Unity.InputSystem"
   ],
   "autoReferenced": false,
   "allowUnsafeCode": false,
