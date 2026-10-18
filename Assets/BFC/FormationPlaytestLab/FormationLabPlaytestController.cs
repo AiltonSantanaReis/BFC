@@ -44,6 +44,7 @@ namespace BFC.FormationPlaytestLab
         private TacticalActionTelemetry _telemetry;
         private LabTacticalLaneOverlay _laneOverlay;
         private LabKickKind _kickKind = LabKickKind.Shot;
+        private LabCinematicActionCamera _actionCamera;
 
         public TacticalActionTelemetry Telemetry => _telemetry;
 
@@ -68,6 +69,8 @@ namespace BFC.FormationPlaytestLab
                 throw new InvalidOperationException("FormationLab ball is missing.");
             }
 
+            _actionCamera = gameObject.AddComponent<LabCinematicActionCamera>();
+            _actionCamera.Initialize(camera, _ball.transform, field);
             _telemetry = new TacticalActionTelemetry(field);
             _laneOverlay = gameObject.AddComponent<LabTacticalLaneOverlay>();
             _laneOverlay.Initialize(_ball.transform,
@@ -130,6 +133,9 @@ namespace BFC.FormationPlaytestLab
 
             if (keyboard != null && keyboard.tKey.wasPressedThisFrame)
                 _laneOverlay.Toggle();
+
+            if (keyboard != null && keyboard.vKey.wasPressedThisFrame)
+                _actionCamera.Toggle();
 
             _laneOverlay.Refresh(
                 _match.State.Phase == MatchPhase.AwaitingAction && !_ballOutOfBounds
@@ -205,6 +211,7 @@ namespace BFC.FormationPlaytestLab
             _restDuration = 0f;
             _telemetry.Begin(piece.Team, piece.SlotId, Mathf.Clamp01(power),
                 _previousBallPosition, _kickKind);
+            _actionCamera.BeginAction(piece.Team);
             float launchLimit = LabKickProfile.ResolveMaximumSpeed(
                 _kickKind, PhysicsLabTuning.MaxLaunchSpeed);
             body.Launch(direction, Mathf.Clamp01(power), launchLimit);
@@ -226,6 +233,7 @@ namespace BFC.FormationPlaytestLab
             {
                 _lastScoringTeam = scorer;
                 _telemetry.Complete(TacticalActionEnd.Goal, currentPosition);
+                _actionCamera.FinishAction(wasGoal: true);
                 StopAllBodies();
                 _shotInProgress = false;
                 _match.ResolvePhysicalAction(PhysicalActionResolution.Goal(scorer));
@@ -250,6 +258,7 @@ namespace BFC.FormationPlaytestLab
             }
 
             _shotInProgress = false;
+            _actionCamera.FinishAction(wasGoal: false);
             TacticalActionRecord record = _telemetry.Complete(
                 _ballOutOfBounds ? TacticalActionEnd.OutOfBounds : TacticalActionEnd.Settled,
                 currentPosition);
@@ -271,7 +280,8 @@ namespace BFC.FormationPlaytestLab
         {
             ClearSelection();
             if (_match.State.Phase != MatchPhase.AwaitingAction ||
-                _shotInProgress || !AllBodiesAtRest())
+                _shotInProgress || !_actionCamera.IsTacticalViewReady ||
+                !AllBodiesAtRest())
             {
                 return;
             }
@@ -335,6 +345,7 @@ namespace BFC.FormationPlaytestLab
         private void RestorePositions()
         {
             _telemetry?.CancelActive();
+            _actionCamera?.RestoreTacticalImmediately();
             StopAllBodies();
             for (int i = 0; i < _bodies.Length; i++)
             {
@@ -433,7 +444,8 @@ namespace BFC.FormationPlaytestLab
                 "TELEMETRIA TATICA - APENAS OBSERVACAO\n" + summary + "\n" +
                 $"Amostras: {_telemetry.Records.Count} | C: exportar CSV | " +
                 $"P: {_kickKind} | T: corredores ({_laneOverlay.VisibleLaneCount}/" +
-                $"{_laneOverlay.GeometricallyClearLaneCount} livres)");
+                $"{_laneOverlay.GeometricallyClearLaneCount} livres) | " +
+                $"V: camera {(_actionCamera.CinematicEnabled ? "cinematica" : "tatica")}");
         }
 
         private void OnDestroy()
