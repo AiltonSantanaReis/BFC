@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace BFC.Physics
@@ -23,6 +24,7 @@ namespace BFC.Physics
         [SerializeField, Min(0f)] private float restSpeed = 0.035f;
 
         private Rigidbody _body;
+        private bool _airborne;
 
         public PhysicsBodyKind Kind => bodyKind;
         public Rigidbody Body => EnsureBody();
@@ -36,7 +38,8 @@ namespace BFC.Physics
             }
         }
 
-        public bool IsAtRest => PlanarSpeed <= restSpeed;
+        public bool IsAirborne => _airborne;
+        public bool IsAtRest => !_airborne && PlanarSpeed <= restSpeed;
 
         private void Awake()
         {
@@ -52,7 +55,8 @@ namespace BFC.Physics
 
             if (speed <= restSpeed)
             {
-                body.linearVelocity = Vector3.zero;
+                body.linearVelocity = _airborne
+                    ? new Vector3(0f, velocity.y, 0f) : Vector3.zero;
                 return;
             }
 
@@ -61,12 +65,14 @@ namespace BFC.Physics
 
             if (nextSpeed <= restSpeed)
             {
-                body.linearVelocity = Vector3.zero;
+                body.linearVelocity = _airborne
+                    ? new Vector3(0f, velocity.y, 0f) : Vector3.zero;
                 return;
             }
 
             Vector2 nextPlanar = planar * (nextSpeed / speed);
-            body.linearVelocity = new Vector3(nextPlanar.x, 0f, nextPlanar.y);
+            body.linearVelocity = new Vector3(nextPlanar.x,
+                _airborne ? velocity.y : 0f, nextPlanar.y);
         }
 
         public void Configure(
@@ -114,16 +120,75 @@ namespace BFC.Physics
             body.linearVelocity = next;
         }
 
+        /// <summary>
+        /// Experimental chip: the ball remains dynamic under PhysX gravity.
+        /// The field has no ball-floor collider yet; landing is handled separately.
+        /// </summary>
+        public void StartVerticalFlight(float upwardVelocity)
+        {
+            if (bodyKind != PhysicsBodyKind.Ball)
+                throw new InvalidOperationException("Only balls may enter flight.");
+            if (float.IsNaN(upwardVelocity) || float.IsInfinity(upwardVelocity) ||
+                upwardVelocity <= 0f)
+                throw new System.ArgumentOutOfRangeException(nameof(upwardVelocity));
+            if (_airborne) throw new InvalidOperationException("Ball is already airborne.");
+
+            Rigidbody body = EnsureBody();
+            _airborne = true;
+            body.constraints = RigidbodyConstraints.FreezeRotationX |
+                               RigidbodyConstraints.FreezeRotationZ;
+            body.useGravity = true;
+            body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            Vector3 previous = body.linearVelocity;
+            body.linearVelocity = new Vector3(previous.x, upwardVelocity, previous.z);
+        }
+
+        /// <summary>
+        /// Re-enters planar motion when the dynamic ball descends through its
+        /// ground center height. This early laboratory approximates the bounce
+        /// with an inelastic landing; it is not final chip collision physics.
+        /// </summary>
+        public bool TryLand(float groundCenterY)
+        {
+            if (float.IsNaN(groundCenterY) || float.IsInfinity(groundCenterY) ||
+                groundCenterY <= 0f)
+                throw new System.ArgumentOutOfRangeException(nameof(groundCenterY));
+            if (!_airborne) return false;
+
+            Rigidbody body = EnsureBody();
+            if (body.position.y > groundCenterY || body.linearVelocity.y > 0f)
+                return false;
+
+            Vector3 center = body.position;
+            body.position = new Vector3(center.x, groundCenterY, center.z);
+            Vector3 previous = body.linearVelocity;
+            body.linearVelocity = new Vector3(previous.x, 0f, previous.z);
+            RestorePlanarConstraints(body);
+            return true;
+        }
+
         public void StopMotion()
         {
             Rigidbody body = EnsureBody();
             body.linearVelocity = Vector3.zero;
             body.angularVelocity = Vector3.zero;
+            if (_airborne) RestorePlanarConstraints(body);
+        }
+
+        private void RestorePlanarConstraints(Rigidbody body)
+        {
+            _airborne = false;
+            body.useGravity = false;
+            body.collisionDetectionMode = CollisionDetectionMode.Discrete;
+            body.constraints = RigidbodyConstraints.FreezePositionY |
+                RigidbodyConstraints.FreezeRotationX |
+                RigidbodyConstraints.FreezeRotationZ;
         }
 
         private void ApplyBodyConfiguration()
         {
             Rigidbody body = EnsureBody();
+            _airborne = false;
             body.mass = bodyMass;
             body.useGravity = false;
             body.interpolation = RigidbodyInterpolation.Interpolate;

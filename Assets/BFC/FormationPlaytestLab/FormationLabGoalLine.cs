@@ -37,7 +37,7 @@ namespace BFC.FormationPlaytestLab
 
             float positiveLine = field.HalfLength + ballRadius;
             if (CrossesPlane(previousBallCenter, currentBallCenter, positiveLine, true,
-                    usableHalfMouth))
+                    usableHalfMouth, ballRadius))
             {
                 scoringTeam = TeamId.TeamA;
                 return true;
@@ -45,7 +45,7 @@ namespace BFC.FormationPlaytestLab
 
             float negativeLine = -field.HalfLength - ballRadius;
             if (CrossesPlane(previousBallCenter, currentBallCenter, negativeLine, false,
-                    usableHalfMouth))
+                    usableHalfMouth, ballRadius))
             {
                 scoringTeam = TeamId.TeamB;
                 return true;
@@ -56,7 +56,7 @@ namespace BFC.FormationPlaytestLab
 
         private static bool CrossesPlane(
             Vector3 previous, Vector3 current, float xLine, bool positive,
-            float usableHalfMouth)
+            float usableHalfMouth, float ballRadius)
         {
             bool crossed = positive
                 ? previous.x <= xLine && current.x > xLine
@@ -74,7 +74,9 @@ namespace BFC.FormationPlaytestLab
 
             float ratio = (xLine - previous.x) / deltaX;
             float crossingZ = Mathf.Lerp(previous.z, current.z, ratio);
-            return Mathf.Abs(crossingZ) <= usableHalfMouth;
+            float crossingHeight = Mathf.Lerp(previous.y, current.y, ratio);
+            return Mathf.Abs(crossingZ) <= usableHalfMouth &&
+                crossingHeight + ballRadius <= FormationLabRuntimeBuilder.GoalHeight;
         }
     }
 }

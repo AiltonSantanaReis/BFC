@@ -11,7 +11,8 @@ namespace BFC.FormationPlaytestLab
     public enum LabKickKind
     {
         Shot = 0,
-        ControlledPass = 1
+        ControlledPass = 1,
+        Chip = 2
     }
 
     public static class LabKickProfile
@@ -29,6 +30,7 @@ namespace BFC.FormationPlaytestLab
             {
                 case LabKickKind.Shot: return shotMaximumSpeed;
                 case LabKickKind.ControlledPass: return shotMaximumSpeed * PassMaxSpeedRatio;
+                case LabKickKind.Chip: return shotMaximumSpeed * 0.75f;
                 default: throw new ArgumentOutOfRangeException(nameof(kind));
             }
         }
