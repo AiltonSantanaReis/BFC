@@ -42,6 +42,8 @@ namespace BFC.FormationPlaytestLab
         private TeamId _lastScoringTeam;
         private MatchController _match;
         private TacticalActionTelemetry _telemetry;
+        private LabTacticalLaneOverlay _laneOverlay;
+        private LabKickKind _kickKind = LabKickKind.Shot;
 
         public TacticalActionTelemetry Telemetry => _telemetry;
 
@@ -67,6 +69,9 @@ namespace BFC.FormationPlaytestLab
             }
 
             _telemetry = new TacticalActionTelemetry(field);
+            _laneOverlay = gameObject.AddComponent<LabTacticalLaneOverlay>();
+            _laneOverlay.Initialize(_ball.transform,
+                fixtures.GetComponentsInChildren<FormationPieceRuntime>());
             FormationLabBallContactObserver observer =
                 _ball.GetComponent<FormationLabBallContactObserver>();
             if (observer == null)
@@ -114,9 +119,22 @@ namespace BFC.FormationPlaytestLab
             }
 
             if (keyboard != null && keyboard.cKey.wasPressedThisFrame)
-            {
                 ExportTelemetryCsv();
+
+            if (keyboard != null && keyboard.pKey.wasPressedThisFrame &&
+                !_shotInProgress && _match.State.Phase == MatchPhase.AwaitingAction)
+            {
+                _kickKind = _kickKind == LabKickKind.Shot
+                    ? LabKickKind.ControlledPass : LabKickKind.Shot;
             }
+
+            if (keyboard != null && keyboard.tKey.wasPressedThisFrame)
+                _laneOverlay.Toggle();
+
+            _laneOverlay.Refresh(
+                _match.State.Phase == MatchPhase.AwaitingAction && !_ballOutOfBounds
+                    ? _match.State.Possession
+                    : TeamId.None);
 
             if (keyboard != null && keyboard.spaceKey.wasPressedThisFrame &&
                 _match.State.Phase == MatchPhase.AwaitingRestart)
@@ -186,8 +204,10 @@ namespace BFC.FormationPlaytestLab
             _shotInProgress = true;
             _restDuration = 0f;
             _telemetry.Begin(piece.Team, piece.SlotId, Mathf.Clamp01(power),
-                _previousBallPosition);
-            body.Launch(direction, Mathf.Clamp01(power), PhysicsLabTuning.MaxLaunchSpeed);
+                _previousBallPosition, _kickKind);
+            float launchLimit = LabKickProfile.ResolveMaximumSpeed(
+                _kickKind, PhysicsLabTuning.MaxLaunchSpeed);
+            body.Launch(direction, Mathf.Clamp01(power), launchLimit);
             return true;
         }
 
@@ -339,6 +359,7 @@ namespace BFC.FormationPlaytestLab
             _match = new MatchController(labRules, TimeSpan.FromMinutes(15));
             _match.StartMatch(TeamId.TeamA);
             _lastScoringTeam = TeamId.None;
+            _kickKind = LabKickKind.Shot;
         }
 
         private void RestartAfterGoal()
@@ -410,7 +431,9 @@ namespace BFC.FormationPlaytestLab
                   $"O:{last.OpponentContactEvents}) - {last.Outcome}";
             GUI.Box(new Rect(12f, 132f, Mathf.Max(240f, Mathf.Min(515f, Screen.width - 24f)), 68f),
                 "TELEMETRIA TATICA - APENAS OBSERVACAO\n" + summary + "\n" +
-                $"Amostras: {_telemetry.Records.Count} | C: exportar CSV (sem alterar regras)");
+                $"Amostras: {_telemetry.Records.Count} | C: exportar CSV | " +
+                $"P: {_kickKind} | T: corredores ({_laneOverlay.VisibleLaneCount}/" +
+                $"{_laneOverlay.GeometricallyClearLaneCount} livres)");
         }
 
         private void OnDestroy()
