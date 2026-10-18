@@ -1,4 +1,6 @@
 using System;
+using System.Globalization;
+using System.IO;
 using BFC.Core.Fields;
 using BFC.Core.Formations;
 using BFC.Core.Matches;
@@ -39,6 +41,9 @@ namespace BFC.FormationPlaytestLab
         private Vector3 _previousBallPosition;
         private TeamId _lastScoringTeam;
         private MatchController _match;
+        private TacticalActionTelemetry _telemetry;
+
+        public TacticalActionTelemetry Telemetry => _telemetry;
 
         public MatchState State => _match != null ? _match.State : null;
         public bool BallOutOfBounds => _ballOutOfBounds;
@@ -60,6 +65,13 @@ namespace BFC.FormationPlaytestLab
             {
                 throw new InvalidOperationException("FormationLab ball is missing.");
             }
+
+            _telemetry = new TacticalActionTelemetry(field);
+            FormationLabBallContactObserver observer =
+                _ball.GetComponent<FormationLabBallContactObserver>();
+            if (observer == null)
+                observer = _ball.gameObject.AddComponent<FormationLabBallContactObserver>();
+            observer.Initialize(_telemetry);
 
             _bodies = fixtures.GetComponentsInChildren<PlanarKineticBody>();
             _startPositions = new Vector3[_bodies.Length];
@@ -99,6 +111,11 @@ namespace BFC.FormationPlaytestLab
             {
                 ResetMatch();
                 return;
+            }
+
+            if (keyboard != null && keyboard.cKey.wasPressedThisFrame)
+            {
+                ExportTelemetryCsv();
             }
 
             if (keyboard != null && keyboard.spaceKey.wasPressedThisFrame &&
@@ -168,6 +185,8 @@ namespace BFC.FormationPlaytestLab
             _previousBallPosition = _ball.transform.position;
             _shotInProgress = true;
             _restDuration = 0f;
+            _telemetry.Begin(piece.Team, piece.SlotId, Mathf.Clamp01(power),
+                _previousBallPosition);
             body.Launch(direction, Mathf.Clamp01(power), PhysicsLabTuning.MaxLaunchSpeed);
             return true;
         }
@@ -180,11 +199,13 @@ namespace BFC.FormationPlaytestLab
             }
 
             Vector3 currentPosition = _ball.transform.position;
+            _telemetry.ObserveBallPosition(currentPosition);
             if (!_ballOutOfBounds && FormationLabGoalLine.TryDetect(
                     _field, _previousBallPosition, currentPosition,
                     PhysicsLabTuning.BallRadius, out TeamId scorer))
             {
                 _lastScoringTeam = scorer;
+                _telemetry.Complete(TacticalActionEnd.Goal, currentPosition);
                 StopAllBodies();
                 _shotInProgress = false;
                 _match.ResolvePhysicalAction(PhysicalActionResolution.Goal(scorer));
@@ -209,6 +230,13 @@ namespace BFC.FormationPlaytestLab
             }
 
             _shotInProgress = false;
+            TacticalActionRecord record = _telemetry.Complete(
+                _ballOutOfBounds ? TacticalActionEnd.OutOfBounds : TacticalActionEnd.Settled,
+                currentPosition);
+            Debug.Log(
+                $"[BFC Telemetry] #{record.Sequence} ballPath={record.BallPathLength:F2} " +
+                $"forward={record.NetForwardProgress:F2} contacts={record.ContactEvents} " +
+                $"outcome={record.Outcome} (laboratory units, not a rules verdict).");
             // The temporary lab only transfers turns on the configured action limit.
             // It does not yet infer possession from contacts, fouls or out-of-bounds.
             _match.ResolvePhysicalAction(PhysicalActionResolution.ContinuePossession());
@@ -286,6 +314,7 @@ namespace BFC.FormationPlaytestLab
 
         private void RestorePositions()
         {
+            _telemetry?.CancelActive();
             StopAllBodies();
             for (int i = 0; i < _bodies.Length; i++)
             {
@@ -329,6 +358,31 @@ namespace BFC.FormationPlaytestLab
             if (_aimLine != null) _aimLine.enabled = false;
         }
 
+        private void ExportTelemetryCsv()
+        {
+            if (_telemetry == null || _telemetry.Records.Count == 0)
+            {
+                Debug.LogWarning("[BFC Telemetry] No completed actions to export.");
+                return;
+            }
+
+            try
+            {
+                string directory = Path.Combine(Application.persistentDataPath, "BFC-Playtests");
+                Directory.CreateDirectory(directory);
+                string name = "field-" + _field.Id + "-" +
+                    DateTime.UtcNow.ToString("yyyyMMdd-HHmmss-fff", CultureInfo.InvariantCulture) +
+                    ".csv";
+                string path = Path.Combine(directory, name);
+                File.WriteAllText(path, _telemetry.ToCsv());
+                Debug.Log($"[BFC Telemetry] CSV exported to: {path}");
+            }
+            catch (Exception error)
+            {
+                Debug.LogError("[BFC Telemetry] Could not write CSV: " + error.Message);
+            }
+        }
+
         private void OnGUI()
         {
             if (_match == null) return;
@@ -345,6 +399,18 @@ namespace BFC.FormationPlaytestLab
                 $"Equipe A {state.Score.TeamA} x {state.Score.TeamB} Equipe B\n" +
                 status + "\n" +
                 "Arrastar/soltar: lancar | R: reiniciar | Espaco: apos gol");
+            if (_telemetry == null) return;
+
+            TacticalActionRecord last = _telemetry.LastRecord;
+            string summary = last == null
+                ? "Sem jogadas concluidas para analisar."
+                : $"Ultima #{last.Sequence}: trajeto={last.BallPathLength:F1}u " +
+                  $"avanco={last.NetForwardProgress:+0.0;-0.0;0.0}u " +
+                  $"contatos={last.ContactEvents} (A:{last.FriendlyContactEvents}/" +
+                  $"O:{last.OpponentContactEvents}) - {last.Outcome}";
+            GUI.Box(new Rect(12f, 132f, Mathf.Max(240f, Mathf.Min(515f, Screen.width - 24f)), 68f),
+                "TELEMETRIA TATICA - APENAS OBSERVACAO\n" + summary + "\n" +
+                $"Amostras: {_telemetry.Records.Count} | C: exportar CSV (sem alterar regras)");
         }
 
         private void OnDestroy()
