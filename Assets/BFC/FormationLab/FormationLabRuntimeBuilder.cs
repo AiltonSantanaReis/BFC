@@ -20,7 +20,7 @@ namespace BFC.FormationLab
         private const float MarkingThickness = 0.045f;
         private const float GoalHeight = 0.95f;
 
-        public static Transform Build(Transform host)
+        public static Transform Build(Transform host, FormationLabFieldProfile profile = FormationLabFieldProfile.Original)
         {
             if (host == null)
             {
@@ -33,7 +33,7 @@ namespace BFC.FormationLab
                 return existing;
             }
 
-            FieldDefinition field = FormationLabPreviewProfiles.CreateLargeFieldPreview();
+            FieldDefinition field = FormationLabPreviewProfiles.CreateFieldPreview(profile);
             FormationDefinition formation = FormationLabPreviewProfiles.CreateLargeFieldBalancedPreview();
 
             Camera camera = EnsureCamera();
@@ -82,14 +82,18 @@ namespace BFC.FormationLab
 
             CreateBall(fixtures, ballMaterial, collisionMaterial);
 
+            // Scale the existing preview framing with the field dimensions.
+            // This is a tactical-lab view, not the future cinematic camera.
+            float cameraScale = Mathf.Max(field.Length / 28f, field.Width / 18f);
             camera.transform.SetPositionAndRotation(
-                new Vector3(0f, 23f, -21f),
+                new Vector3(0f, 23f * cameraScale, -21f * cameraScale),
                 Quaternion.Euler(52f, 0f, 0f));
             camera.fieldOfView = 48f;
 
             Debug.Log(
-                "[BFC FormationLab] Large-field preview materialized: 11 pieces per team " +
-                "(10 outfield + 1 goalkeeper). Preview dimensions and tactical layout are tunable, not final rules.");
+                $"[BFC FormationLab] profile={profile} field={field.Length}x{field.Width}: " +
+                "11 pieces per team (10 outfield + 1 goalkeeper). " +
+                "Laboratory dimensions are not final or competitive rules.");
 
             return fixtures;
         }
