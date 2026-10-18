@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Linq;
+using BFC.Core.Fields;
 using BFC.Core.Formations;
 using BFC.FormationLab;
 using BFC.Physics;
@@ -11,6 +12,51 @@ namespace BFC.Tests.PlayMode
 {
     public sealed class FormationLabSmokeTests
     {
+        [TestCase(FormationLabFieldProfile.Original, 28f, 18f)]
+        [TestCase(FormationLabFieldProfile.Intermediate, 36f, 23f)]
+        [TestCase(FormationLabFieldProfile.Tactical, 42f, 27f)]
+        [TestCase(FormationLabFieldProfile.Experimental, 48f, 31f)]
+        public void FieldProfiles_ChangeOnlyThePlayableScale(
+            FormationLabFieldProfile profile, float length, float width)
+        {
+            FieldDefinition field = FormationLabPreviewProfiles.CreateFieldPreview(profile);
+
+            Assert.That(field.Length, Is.EqualTo(length));
+            Assert.That(field.Width, Is.EqualTo(width));
+            Assert.That(field.GoalMouthWidth, Is.EqualTo(4.4f));
+            Assert.That(field.GoalAreaLength, Is.EqualTo(3.5f));
+            Assert.That(field.GoalAreaWidth, Is.EqualTo(8f));
+        }
+
+        [Test]
+        public void FieldProfiles_RejectUnknownValues()
+        {
+            Assert.Throws<System.ArgumentOutOfRangeException>(() =>
+                FormationLabPreviewProfiles.CreateFieldPreview((FormationLabFieldProfile)999));
+        }
+
+        [UnityTest]
+        public IEnumerator TacticalFieldPreviewMaterializesExpectedDimensionsAndTeamCount()
+        {
+            GameObject host = new GameObject("Tactical Field Test Host");
+            Transform fixtures = FormationLabRuntimeBuilder.Build(
+                host.transform, FormationLabFieldProfile.Tactical);
+
+            yield return null;
+
+            Transform surface = fixtures.Find(FormationLabRuntimeBuilder.FieldSurfaceName);
+            Assert.That(surface, Is.Not.Null);
+            Assert.That(surface.localScale.x, Is.EqualTo(42f).Within(0.001f));
+            Assert.That(surface.localScale.z, Is.EqualTo(27f).Within(0.001f));
+
+            FormationPieceRuntime[] pieces = fixtures.GetComponentsInChildren<FormationPieceRuntime>();
+            Assert.That(pieces.Length, Is.EqualTo(22));
+            Assert.That(pieces.Count(piece => piece.Role == PieceRole.Goalkeeper), Is.EqualTo(2));
+
+            Object.Destroy(host);
+            yield return null;
+        }
+
         [UnityTest]
         public IEnumerator LargeFieldPreviewMaterializesTwentyTwoPiecesAndBall()
         {

@@ -1,3 +1,4 @@
+using System;
 using BFC.Core.Fields;
 using BFC.Core.Formations;
 
@@ -7,14 +8,64 @@ namespace BFC.FormationLab
     /// Phase 4 preview content only. Numeric field dimensions and this tactical layout are
     /// intentionally not normative competitive values.
     /// </summary>
+    /// <summary>
+    /// Alternative laboratory field scales. These are experiment presets,
+    /// not regulations for any BFC competitive or traditional mode.
+    /// </summary>
+    public enum FormationLabFieldProfile
+    {
+        Original = 0,
+        Intermediate = 1,
+        Tactical = 2,
+        Experimental = 3
+    }
+
     public static class FormationLabPreviewProfiles
     {
         public static FieldDefinition CreateLargeFieldPreview()
         {
+            // Compatibility alias for existing Phase 4 tests and callers.
+            return CreateFieldPreview(FormationLabFieldProfile.Original);
+        }
+
+        public static FieldDefinition CreateFieldPreview(FormationLabFieldProfile profile)
+        {
+            string id;
+            float length;
+            float width;
+
+            switch (profile)
+            {
+                case FormationLabFieldProfile.Original:
+                    id = "phase4-large-field-preview";
+                    length = 28f;
+                    width = 18f;
+                    break;
+                case FormationLabFieldProfile.Intermediate:
+                    id = "lab-intermediate-36x23";
+                    length = 36f;
+                    width = 23f;
+                    break;
+                case FormationLabFieldProfile.Tactical:
+                    id = "lab-tactical-42x27";
+                    length = 42f;
+                    width = 27f;
+                    break;
+                case FormationLabFieldProfile.Experimental:
+                    id = "lab-experimental-48x31";
+                    length = 48f;
+                    width = 31f;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(profile), profile, "Unknown laboratory field profile.");
+            }
+
+            // Hold goal dimensions constant: first isolate the effect of
+            // additional playable space, without making scoring easier.
             return new FieldDefinition(
-                id: "phase4-large-field-preview",
-                length: 28f,
-                width: 18f,
+                id: id,
+                length: length,
+                width: width,
                 goalMouthWidth: 4.4f,
                 goalDepth: 1.6f,
                 goalAreaLength: 3.5f,
