@@ -45,6 +45,11 @@ namespace BFC.FormationPlaytestLab
         private LabTacticalLaneOverlay _laneOverlay;
         private LabKickKind _kickKind = LabKickKind.Shot;
         private LabCinematicActionCamera _actionCamera;
+        private bool _opponentAIEnabled;
+        private bool _aiDelayInitialized;
+        private float _aiCooldownSeconds;
+
+        public bool OpponentAIEnabled => _opponentAIEnabled;
 
         public TacticalActionTelemetry Telemetry => _telemetry;
         public LabKickKind CurrentKickKind => _kickKind;
@@ -135,6 +140,9 @@ namespace BFC.FormationPlaytestLab
             if (keyboard != null && keyboard.vKey.wasPressedThisFrame)
                 _actionCamera.Toggle();
 
+            if (keyboard != null && keyboard.iKey.wasPressedThisFrame)
+                TrySetOpponentAI(!_opponentAIEnabled);
+
             _laneOverlay.Refresh(
                 _match.State.Phase == MatchPhase.AwaitingAction && !_ballOutOfBounds
                     ? _match.State.Possession
@@ -146,6 +154,8 @@ namespace BFC.FormationPlaytestLab
                 RestartAfterGoal();
                 return;
             }
+
+            TickOpponentAI();
 
             Mouse mouse = Mouse.current;
             if (mouse == null || _camera == null || _ballOutOfBounds)
@@ -170,6 +180,80 @@ namespace BFC.FormationPlaytestLab
                 float power = _aimPower;
                 ClearSelection();
                 TryLaunch(selection, direction, power);
+            }
+        }
+
+        /// <summary>Opt-in P1 vs COM laboratory. Team B is CPU controlled only when enabled.</summary>
+        public bool TrySetOpponentAI(bool enabled)
+        {
+            if (_match == null || _shotInProgress || _ballOutOfBounds ||
+                _match.State.Phase != MatchPhase.AwaitingAction)
+                return false;
+
+            _opponentAIEnabled = enabled;
+            _aiDelayInitialized = false;
+            _aiCooldownSeconds = 0f;
+            ClearSelection();
+            return true;
+        }
+
+        private void TickOpponentAI()
+        {
+            if (!_opponentAIEnabled || _shotInProgress || _ballOutOfBounds ||
+                _match.State.Phase != MatchPhase.AwaitingAction ||
+                _match.State.Possession != TeamId.TeamB)
+            {
+                _aiDelayInitialized = false;
+                return;
+            }
+
+            if (!_aiDelayInitialized)
+            {
+                _aiDelayInitialized = true;
+                _aiCooldownSeconds = 0.8f;
+            }
+
+            _aiCooldownSeconds -= Time.unscaledDeltaTime;
+            if (_aiCooldownSeconds > 0f || !_actionCamera.IsTacticalViewReady)
+                return;
+
+            // Even the AI must use the *same* legal selection and launch path.
+            // It cannot reposition the goalkeeper or move the ball directly.
+            _aiCooldownSeconds = 0.8f;
+            FormationPieceRuntime[] pieces =
+                _fixtures.GetComponentsInChildren<FormationPieceRuntime>();
+            var snapshot = new LabAIPlayer[pieces.Length];
+            for (int i = 0; i < pieces.Length; i++)
+            {
+                Vector3 pos = pieces[i].transform.position;
+                snapshot[i] = new LabAIPlayer(
+                    pieces[i].Team, pieces[i].SlotId, pieces[i].Role,
+                    new Vector2(pos.x, pos.z));
+            }
+
+            Vector3 ball = _ball.transform.position;
+            if (!LabTacticalOpponentPlanner.TryChoose(
+                TeamId.TeamB, new Vector2(ball.x, ball.z), _field,
+                snapshot, out LabAIPlan plan))
+            {
+                Debug.LogWarning("[BFC AI Lab] No valid outfield candidate.");
+                return;
+            }
+
+            foreach (FormationPieceRuntime piece in pieces)
+            {
+                if (piece.Team != TeamId.TeamB ||
+                    piece.Role != PieceRole.Outfield || piece.SlotId != plan.PieceId)
+                    continue;
+
+                TrySetKickKind(plan.Kind);
+                bool launched = TryLaunch(piece,
+                    new Vector3(plan.Direction.x, 0f, plan.Direction.y), plan.Power);
+                if (launched)
+                    Debug.Log($"[BFC AI Lab] {plan.PieceId} launched {plan.Kind} " +
+                              $"power={plan.Power:F2}, estimated blockers={plan.PotentialBlockers}. " +
+                              "Experimental heuristic, no rules changed.");
+                break;
             }
         }
 
@@ -294,6 +378,7 @@ namespace BFC.FormationPlaytestLab
             ClearSelection();
             if (_match.State.Phase != MatchPhase.AwaitingAction ||
                 _shotInProgress || !_actionCamera.IsTacticalViewReady ||
+                (_opponentAIEnabled && _match.State.Possession == TeamId.TeamB) ||
                 !AllBodiesAtRest())
             {
                 return;
@@ -384,6 +469,7 @@ namespace BFC.FormationPlaytestLab
             _match.StartMatch(TeamId.TeamA);
             _lastScoringTeam = TeamId.None;
             _kickKind = LabKickKind.Shot;
+            _aiDelayInitialized = false;
         }
 
         private void RestartAfterGoal()
@@ -458,7 +544,8 @@ namespace BFC.FormationPlaytestLab
                 $"Amostras: {_telemetry.Records.Count} | C: exportar CSV | " +
                 $"P: {_kickKind} | T: corredores ({_laneOverlay.VisibleLaneCount}/" +
                 $"{_laneOverlay.GeometricallyClearLaneCount} livres) | " +
-                $"V: camera {(_actionCamera.CinematicEnabled ? "cinematica" : "tatica")}");
+                $"V: camera {(_actionCamera.CinematicEnabled ? "cinematica" : "tatica")} | " +
+                $"I: {(_opponentAIEnabled ? "P1 vs COM" : "P1 vs P2")}");
         }
 
         private void OnDestroy()
