@@ -20,13 +20,17 @@ namespace BFC.FormationLab
         private const float MarkingThickness = 0.045f;
         public const float GoalHeight = 0.95f;
 
-        public static Transform Build(Transform host, FormationLabFieldProfile profile = FormationLabFieldProfile.Original)
+        public static Transform Build(Transform host,
+            FormationLabFieldProfile profile = FormationLabFieldProfile.Original,
+            FormationLabColliderProfile colliderProfile = FormationLabColliderProfile.SphereBaseline)
         {
             if (host == null)
             {
                 throw new ArgumentNullException(nameof(host));
             }
 
+            if (!Enum.IsDefined(typeof(FormationLabColliderProfile), colliderProfile))
+                throw new ArgumentOutOfRangeException(nameof(colliderProfile));
             Transform existing = host.Find(FixturesName);
             if (existing != null)
             {
@@ -71,14 +75,16 @@ namespace BFC.FormationLab
                 fixtures,
                 teamAMaterial,
                 goalkeeperMaterial,
-                collisionMaterial);
+                collisionMaterial,
+                colliderProfile);
             CreateTeam(
                 TeamId.TeamB,
                 teamBSpawns,
                 fixtures,
                 teamBMaterial,
                 goalkeeperMaterial,
-                collisionMaterial);
+                collisionMaterial,
+                colliderProfile);
 
             CreateBall(fixtures, ballMaterial, collisionMaterial);
 
@@ -91,7 +97,7 @@ namespace BFC.FormationLab
             camera.fieldOfView = 48f;
 
             Debug.Log(
-                $"[BFC FormationLab] profile={profile} field={field.Length}x{field.Width}: " +
+                $"[BFC FormationLab] profile={profile} collider={colliderProfile} field={field.Length}x{field.Width}: " +
                 "11 pieces per team (10 outfield + 1 goalkeeper). " +
                 "Laboratory dimensions are not final or competitive rules.");
 
@@ -253,7 +259,8 @@ namespace BFC.FormationLab
             Transform parent,
             Material teamMaterial,
             Material goalkeeperMaterial,
-            PhysicsMaterial collisionMaterial)
+            PhysicsMaterial collisionMaterial,
+            FormationLabColliderProfile colliderProfile)
         {
             Transform teamRoot = new GameObject(team.ToString()).transform;
             teamRoot.SetParent(parent, false);
@@ -264,7 +271,7 @@ namespace BFC.FormationLab
                 Material visualMaterial = spawn.Role == PieceRole.Goalkeeper
                     ? goalkeeperMaterial
                     : teamMaterial;
-                CreatePiece(team, spawn, teamRoot, visualMaterial, collisionMaterial);
+                CreatePiece(team, spawn, teamRoot, visualMaterial, collisionMaterial, colliderProfile);
             }
         }
 
@@ -273,15 +280,19 @@ namespace BFC.FormationLab
             FormationSpawn spawn,
             Transform parent,
             Material visualMaterial,
-            PhysicsMaterial collisionMaterial)
+            PhysicsMaterial collisionMaterial,
+            FormationLabColliderProfile colliderProfile)
         {
             GameObject root = new GameObject($"{team} {spawn.PieceId}");
             root.transform.SetParent(parent, false);
             root.transform.position = new Vector3(spawn.X, PhysicsLabTuning.PieceHeight * 0.5f, spawn.Z);
 
-            SphereCollider collider = root.AddComponent<SphereCollider>();
-            collider.radius = PhysicsLabTuning.PieceRadius;
-            collider.material = collisionMaterial;
+            if (colliderProfile == FormationLabColliderProfile.SphereBaseline)
+            {
+                SphereCollider collider = root.AddComponent<SphereCollider>();
+                collider.radius = PhysicsLabTuning.PieceRadius;
+                collider.material = collisionMaterial;
+            }
 
             PlanarKineticBody body = root.AddComponent<PlanarKineticBody>();
             body.Configure(
@@ -297,12 +308,21 @@ namespace BFC.FormationLab
             GameObject visual = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             visual.name = "Visual";
             visual.transform.SetParent(root.transform, false);
+            // Unity Cylinder primitive radius is 0.5: old render radius was
+            // half that of the physics SphereCollider. Match the diameters.
             visual.transform.localScale = new Vector3(
-                PhysicsLabTuning.PieceRadius,
+                PhysicsLabTuning.PieceRadius * 2f,
                 PhysicsLabTuning.PieceHeight * 0.5f,
-                PhysicsLabTuning.PieceRadius);
+                PhysicsLabTuning.PieceRadius * 2f);
             visual.GetComponent<Renderer>().sharedMaterial = visualMaterial;
             visual.GetComponent<Collider>().enabled = false;
+            if (colliderProfile == FormationLabColliderProfile.ConvexDisc)
+            {
+                MeshCollider disc = visual.AddComponent<MeshCollider>();
+                disc.sharedMesh = visual.GetComponent<MeshFilter>().sharedMesh;
+                disc.convex = true;
+                disc.material = collisionMaterial;
+            }
         }
 
         private static void CreateBall(

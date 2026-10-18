@@ -1,12 +1,12 @@
 # Guia consolidado para Codex — PENDENTE DE VALIDAÇÃO
 
-**Experimentos empilhados #13 → #14 → #15 → #16 → #17 → #18 → #19.**
+**Experimentos empilhados #13 → #14 → #15 → #16 → #17 → #18 → #19 → #21 → #22 → #23 → #24 → #25.**
 Última branch contém as alterações anteriores, mas **nenhuma
 foi aprovada**. Validar na branch, não na `main`.
 
 ## Ordem recomendada
 
-1. Checkout `experiments/first-ai-opponent`.
+1. Checkout `experiments/disc-collider-fidelity`.
 2. Validar scripts:
    - `python scripts/validate_unity_structure.py`
    - `python scripts/validate_governance.py`
@@ -48,10 +48,32 @@ Amostras podem ser correlacionadas entre si. O relatório não estima
 intervalos de confiança nem qualidade competitiva. Gols e bola fora
 vêm de detectores experimentais, não da arbitragem definitiva.
 
+## Novas validações de física, goleiro e geometria (#21–#25)
+
+- [ ] Testar `GoalkeeperControlPolicyTests`: modos automáticos
+      bloqueiam reposicionamento manual; janelas permitidas somente
+      por eventos explícitos com tempo, equipe e área válidos.
+- [ ] Exercício K no laboratório **P1 vs P2**, nunca no P1 vs COM:
+      click prepara proposta e Enter confirma; goleiro não se move
+      fora da janela. Tempo de seis segundos e área são temporários.
+- [ ] Comparar **Q/E/X** para spin esquerdo/direito/neutro. Bola não
+      deve ganhar spin antes do contato com a peça realmente lançada.
+- [ ] Testar **H** para Chip: bola com gravidade real após contato,
+      retorno ao plano antes da próxima jogada, sem gol acima da trave.
+- [ ] Comparar `-bfcPieceCollider=SphereBaseline` (padrão)
+      com `-bfcPieceCollider=ConvexDisc` (experimental).
+      Medir contatos rasantes, sensação visual de diâmetro,
+      desempenho e rebotes nos quatro campos.
+- [ ] Verificar se alterações em spin, chip ou collider interferem
+      nas regras existentes, gols, AI, telemetria e câmera.
+- [ ] Documentar falhas e gráficos reais; sem homologação antes do
+      editor Unity, hardware e avaliação humana.
+
 ## Pendências de produto não concluídas
 
-- Regras finais por modalidade e janelas de goleiro;
-- posse por toque, spin, chip e passe normativo;
+- Regras finais por modalidade e integração das janelas do goleiro;
+- Goleiro automático competitivo (ainda não implementado);
+- posse por toque, spin/chip de produção e passe normativo;
 - reposições/faltas/pênaltis (OPEN-002/003);
 - P1 vs COM, rede, áudio, replays e arte final;
 - decisão futura Unity/Unreal.
@@ -60,11 +82,17 @@ vêm de detectores experimentais, não da arbitragem definitiva.
 
 ```text
 No repositorio AiltonSantanaReis/BFC, valide a branch
-experiments/first-ai-opponent, nao a main. Execute validadores
+experiments/disc-collider-fidelity, nao a main. Execute validadores
 Python, Unity 6000.3.21f1 e scripts/run-unity-tests.ps1. Teste
 FormationLab -bfcPlayableLab nos campos Original, Intermediate,
-Tactical, Experimental, com comandos P/T/V/I/R/C/Espaco. Teste o adversario P1 vs COM sem alterar regras. Gere CSVs por
+Tactical, Experimental, com comandos P/T/V/I/R/C/Espaco. Teste o adversario P1 vs COM sem alterar regras. Compare Q/E/X
+para spin, H para chip, K para janela de goleiro em P1 vs P2 e
+SphereBaseline versus ConvexDisc com -bfcPieceCollider=ConvexDisc. Gere CSVs por
 perfil, analise com scripts/report_field_telemetry.py e anexe logs,
 XML, telas e falhas reproduziveis. Nao faca merges, nem aprove regras
 sem evidencia humana e tecnica.
 ```
+
+**STATUS DO CONJUNTO:** PENDENTE DE VALIDAÇÃO (Unity/Codex). Os checks
+GitHub "Governance" e "Unity Structure" não executam Unity. Os PRs
+continuam draft e nenhuma das melhorias foi integrada à main.
