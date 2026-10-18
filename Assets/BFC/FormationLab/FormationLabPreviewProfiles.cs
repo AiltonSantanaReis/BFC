@@ -12,6 +12,13 @@ namespace BFC.FormationLab
     /// Alternative laboratory field scales. These are experiment presets,
     /// not regulations for any BFC competitive or traditional mode.
     /// </summary>
+    /// <summary>Laboratory only: official hitboxes do not change.</summary>
+    public enum FormationLabColliderProfile
+    {
+        SphereBaseline = 0,
+        ConvexDisc = 1
+    }
+
     public enum FormationLabFieldProfile
     {
         Original = 0,

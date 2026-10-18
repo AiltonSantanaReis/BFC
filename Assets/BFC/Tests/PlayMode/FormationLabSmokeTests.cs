@@ -58,6 +58,38 @@ namespace BFC.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator ConvexDiscColliderMatchesRenderedRadiusAndKeepsOneRigidbody()
+        {
+            GameObject host = new GameObject("BFC Collider Profile Test");
+            Transform fixtures = FormationLabRuntimeBuilder.Build(host.transform,
+                FormationLabFieldProfile.Tactical, FormationLabColliderProfile.ConvexDisc);
+            yield return null;
+
+            FormationPieceRuntime[] pieces =
+                fixtures.GetComponentsInChildren<FormationPieceRuntime>();
+            Assert.That(pieces.Length, Is.EqualTo(22));
+            foreach (FormationPieceRuntime piece in pieces)
+            {
+                Transform visual = piece.transform.Find("Visual");
+                Assert.That(visual, Is.Not.Null);
+                Assert.That(visual.localScale.x,
+                    Is.EqualTo(PhysicsLabTuning.PieceRadius * 2f).Within(0.0001f));
+                Assert.That(visual.localScale.z,
+                    Is.EqualTo(PhysicsLabTuning.PieceRadius * 2f).Within(0.0001f));
+                Assert.That(piece.GetComponent<SphereCollider>(), Is.Null);
+                Assert.That(piece.GetComponent<Rigidbody>(), Is.Not.Null);
+                MeshCollider disc = visual.GetComponent<MeshCollider>();
+                Assert.That(disc, Is.Not.Null);
+                Assert.That(disc.convex, Is.True);
+                Assert.That(disc.sharedMesh, Is.Not.Null);
+                Assert.That(disc.enabled, Is.True);
+            }
+
+            Object.Destroy(host);
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator LargeFieldPreviewMaterializesTwentyTwoPiecesAndBall()
         {
             GameObject host = new GameObject("FormationLab Test Host");
@@ -75,6 +107,10 @@ namespace BFC.Tests.PlayMode
             Assert.That(pieces.Count(piece => piece.Role == PieceRole.Goalkeeper), Is.EqualTo(2));
             Assert.That(pieces.Count(piece => piece.Role == PieceRole.Outfield), Is.EqualTo(20));
             Assert.That(pieces.All(piece => piece.transform.localScale == Vector3.one), Is.True);
+            Assert.That(pieces.All(piece =>
+                piece.GetComponent<SphereCollider>() != null &&
+                piece.transform.Find("Visual").localScale.x ==
+                PhysicsLabTuning.PieceRadius * 2f), Is.True);
 
             PlanarKineticBody[] bodies = fixtures.GetComponentsInChildren<PlanarKineticBody>();
             Assert.That(bodies.Length, Is.EqualTo(23));
