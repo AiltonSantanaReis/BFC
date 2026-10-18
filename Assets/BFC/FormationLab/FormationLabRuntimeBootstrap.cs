@@ -12,6 +12,9 @@ namespace BFC.FormationLab
 
         [SerializeField] private FormationLabFieldProfile defaultFieldProfile = FormationLabFieldProfile.Original;
 
+        public FormationLabFieldProfile ActiveProfile { get; private set; }
+        public Transform GeneratedFixtures { get; private set; }
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void AttachWhenFormationLabLoads()
         {
@@ -31,7 +34,8 @@ namespace BFC.FormationLab
 
         private void Awake()
         {
-            FormationLabRuntimeBuilder.Build(transform, ResolveFieldProfile());
+            ActiveProfile = ResolveFieldProfile();
+            GeneratedFixtures = FormationLabRuntimeBuilder.Build(transform, ActiveProfile);
 
             if (FormationLabPerformanceProbe.IsRequested() &&
                 GetComponent<FormationLabPerformanceProbe>() == null)
