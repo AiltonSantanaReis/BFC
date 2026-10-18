@@ -12,11 +12,14 @@ namespace BFC.FormationPlaytestLab
     {
         private TacticalActionTelemetry _telemetry;
         private LabBallSpinController _spin;
+        private LabBallChipFlight _chip;
 
-        public void Initialize(TacticalActionTelemetry telemetry, LabBallSpinController spin)
+        public void Initialize(TacticalActionTelemetry telemetry, LabBallSpinController spin,
+            LabBallChipFlight chip)
         {
             _telemetry = telemetry;
             _spin = spin;
+            _chip = chip;
         }
 
         private void OnCollisionEnter(Collision collision)
@@ -30,6 +33,7 @@ namespace BFC.FormationPlaytestLab
             {
                 _telemetry.ObserveBallContact(piece.Team, piece.SlotId);
                 _spin?.OnPieceContact(piece);
+                _chip?.OnPieceContact(piece);
             }
         }
     }

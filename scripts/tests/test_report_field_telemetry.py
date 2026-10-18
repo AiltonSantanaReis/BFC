@@ -62,6 +62,13 @@ class TelemetryReportTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 read_samples([path])
 
+    def test_chip_samples_are_supported(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = self.write_csv(folder, [self.row(kick_kind="Chip")])
+            parsed = read_samples([path])
+            self.assertEqual(parsed[0]["kick"], "Chip")
+            self.assertEqual(len(summarize(parsed)), 1)
+
     def test_missing_csv_columns_rejected(self):
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "broken.csv"

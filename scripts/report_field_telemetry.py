@@ -41,7 +41,7 @@ def read_samples(paths: list[Path]) -> list[dict]:
                     raise ValueError(f"{label}: invalid nonnegative/positive constraints")
                 if not math.isclose(traveled / length, normalized, rel_tol=1e-4, abs_tol=1e-5):
                     raise ValueError(f"{label}: path_field_ratio inconsistent with ball_path")
-                if not row["field_id"] or row["kick_kind"] not in {"Shot", "ControlledPass"}:
+                if not row["field_id"] or row["kick_kind"] not in {"Shot", "ControlledPass", "Chip"}:
                     raise ValueError(f"{label}: invalid field or action")
                 if row["outcome"] not in {"Settled", "Goal", "OutOfBounds"}:
                     raise ValueError(f"{label}: invalid outcome")

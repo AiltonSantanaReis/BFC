@@ -18,7 +18,7 @@ namespace BFC.FormationLab
         private const string RuntimeMaterialResourceName = "BFCFormationLabRuntimeMaterial";
         private const float SurfaceThickness = 0.16f;
         private const float MarkingThickness = 0.045f;
-        private const float GoalHeight = 0.95f;
+        public const float GoalHeight = 0.95f;
 
         public static Transform Build(Transform host, FormationLabFieldProfile profile = FormationLabFieldProfile.Original)
         {
