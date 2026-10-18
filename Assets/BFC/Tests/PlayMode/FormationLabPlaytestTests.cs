@@ -37,6 +37,38 @@ namespace BFC.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator ControlledPassHasReducedActualLaunchSpeed_AndLocksModeDuringAction()
+        {
+            GameObject host = new GameObject("BFC Pass Validation Host");
+            FieldDefinition field = FormationLabPreviewProfiles.CreateFieldPreview(
+                FormationLabFieldProfile.Tactical);
+            Transform fixtures = FormationLabRuntimeBuilder.Build(
+                host.transform, FormationLabFieldProfile.Tactical);
+
+            var playtest = host.AddComponent<FormationLabPlaytestController>();
+            playtest.Initialize(fixtures, field, Camera.main);
+            yield return null;
+
+            FormationPieceRuntime piece = fixtures.GetComponentsInChildren<FormationPieceRuntime>()
+                .First(p => p.Team == TeamId.TeamA && p.Role == PieceRole.Outfield);
+            var body = piece.GetComponent<BFC.Physics.PlanarKineticBody>();
+
+            Assert.That(playtest.TrySetKickKind((LabKickKind)999), Is.False);
+            Assert.That(playtest.TrySetKickKind(LabKickKind.ControlledPass), Is.True);
+            Assert.That(playtest.CurrentKickKind, Is.EqualTo(LabKickKind.ControlledPass));
+            Assert.That(playtest.TryLaunch(piece, Vector3.right, 1f), Is.True);
+            Assert.That(body.PlanarSpeed, Is.EqualTo(
+                LabKickProfile.ResolveMaximumSpeed(LabKickKind.ControlledPass,
+                    BFC.Physics.PhysicsLabTuning.MaxLaunchSpeed)).Within(0.0001f));
+            Assert.That(playtest.Telemetry.IsRecording, Is.True);
+            Assert.That(playtest.TrySetKickKind(LabKickKind.Shot), Is.False);
+            Assert.That(playtest.CurrentKickKind, Is.EqualTo(LabKickKind.ControlledPass));
+
+            Object.Destroy(host);
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator PlaytestAcceptsOwningOutfieldPieceAndBlocksGoalkeeperAndSecondShot()
         {
             GameObject host = new GameObject("BFC Playtest Validation Host");

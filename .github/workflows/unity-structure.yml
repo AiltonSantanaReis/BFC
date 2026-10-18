@@ -23,3 +23,6 @@ jobs:
 
       - name: Validate Unity project structure
         run: python scripts/validate_unity_structure.py
+
+      - name: Check experimental telemetry report calculations
+        run: python -m unittest discover -s scripts/tests -p "test_*.py" -v

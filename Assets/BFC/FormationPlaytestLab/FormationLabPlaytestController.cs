@@ -47,6 +47,7 @@ namespace BFC.FormationPlaytestLab
         private LabCinematicActionCamera _actionCamera;
 
         public TacticalActionTelemetry Telemetry => _telemetry;
+        public LabKickKind CurrentKickKind => _kickKind;
 
         public MatchState State => _match != null ? _match.State : null;
         public bool BallOutOfBounds => _ballOutOfBounds;
@@ -124,12 +125,9 @@ namespace BFC.FormationPlaytestLab
             if (keyboard != null && keyboard.cKey.wasPressedThisFrame)
                 ExportTelemetryCsv();
 
-            if (keyboard != null && keyboard.pKey.wasPressedThisFrame &&
-                !_shotInProgress && _match.State.Phase == MatchPhase.AwaitingAction)
-            {
-                _kickKind = _kickKind == LabKickKind.Shot
-                    ? LabKickKind.ControlledPass : LabKickKind.Shot;
-            }
+            if (keyboard != null && keyboard.pKey.wasPressedThisFrame)
+                TrySetKickKind(_kickKind == LabKickKind.Shot
+                    ? LabKickKind.ControlledPass : LabKickKind.Shot);
 
             if (keyboard != null && keyboard.tKey.wasPressedThisFrame)
                 _laneOverlay.Toggle();
@@ -175,11 +173,26 @@ namespace BFC.FormationPlaytestLab
             }
         }
 
+        /// <summary>
+        /// Future radial-menu adapter. Selecting a mode never executes a launch.
+        /// Rejects changes while resolving the current action or restart.
+        /// </summary>
+        public bool TrySetKickKind(LabKickKind kind)
+        {
+            if (_match == null || _shotInProgress || _ballOutOfBounds ||
+                _match.State.Phase != MatchPhase.AwaitingAction ||
+                !Enum.IsDefined(typeof(LabKickKind), kind))
+                return false;
+            _kickKind = kind;
+            return true;
+        }
+
         /// <summary>Public for PlayMode tests; all competitive eligibility is checked here.</summary>
         public bool TryLaunch(FormationPieceRuntime piece, Vector3 direction, float power)
         {
             if (_match == null || _shotInProgress || _ballOutOfBounds ||
                 _match.State.Phase != MatchPhase.AwaitingAction ||
+                !_actionCamera.IsTacticalViewReady ||
                 piece == null || !piece.transform.IsChildOf(_fixtures) ||
                 piece.Role != PieceRole.Outfield ||
                 piece.Team != _match.State.Possession ||
