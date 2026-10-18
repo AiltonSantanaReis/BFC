@@ -37,6 +37,42 @@ namespace BFC.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator AnnouncedShotBlocksAttackerUntilDefenderCommits()
+        {
+            GameObject host = new GameObject("Goalkeeper Announcement Test Host");
+            FieldDefinition field = FormationLabPreviewProfiles.CreateFieldPreview(
+                FormationLabFieldProfile.Tactical);
+            Transform fixtures = FormationLabRuntimeBuilder.Build(
+                host.transform, FormationLabFieldProfile.Tactical);
+            var playtest = host.AddComponent<FormationLabPlaytestController>();
+            playtest.Initialize(fixtures, field, Camera.main);
+            yield return null;
+
+            FormationPieceRuntime shooter = fixtures
+                .GetComponentsInChildren<FormationPieceRuntime>()
+                .First(p => p.Team == TeamId.TeamA && p.Role == PieceRole.Outfield);
+            FormationPieceRuntime goalkeeper = fixtures
+                .GetComponentsInChildren<FormationPieceRuntime>()
+                .First(p => p.Team == TeamId.TeamB && p.Role == PieceRole.Goalkeeper);
+
+            Vector3 original = goalkeeper.transform.position;
+            Assert.That(playtest.TryAnnounceShot(), Is.True);
+            Assert.That(playtest.IsGoalkeeperWindowOpen, Is.True);
+            Assert.That(playtest.TryLaunch(shooter, Vector3.right, 1f), Is.False);
+            Assert.That(playtest.TrySetKickKind(LabKickKind.Chip), Is.False);
+            Assert.That(playtest.TryProposeGoalkeeper(TeamId.TeamB, 20f, 0f), Is.True);
+            Assert.That(goalkeeper.transform.position, Is.EqualTo(original));
+            Assert.That(playtest.TryConfirmGoalkeeper(TeamId.TeamA), Is.False);
+            Assert.That(playtest.TryConfirmGoalkeeper(TeamId.TeamB), Is.True);
+            Assert.That(playtest.IsGoalkeeperWindowOpen, Is.False);
+            Assert.That(goalkeeper.transform.position.x, Is.EqualTo(20f).Within(.001f));
+            Assert.That(playtest.TryLaunch(shooter, Vector3.right, 0.5f), Is.True);
+
+            Object.Destroy(host);
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator ControlledPassHasReducedActualLaunchSpeed_AndLocksModeDuringAction()
         {
             GameObject host = new GameObject("BFC Pass Validation Host");
