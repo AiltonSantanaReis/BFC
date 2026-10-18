@@ -27,7 +27,7 @@ namespace BFC.FormationPlaytestLab
             float traveled, float maximumForward, float maximumDisplacement,
             int contacts, int friendlyContacts, int opponentContacts, int uniquePieces,
             TeamId lastContactTeam, string lastContactPiece, TacticalActionEnd outcome,
-            LabKickKind kickKind)
+            LabKickKind kickKind, int spinDirection)
         {
             Sequence = sequence;
             FieldId = fieldId;
@@ -49,6 +49,7 @@ namespace BFC.FormationPlaytestLab
             LastContactPieceId = lastContactPiece;
             Outcome = outcome;
             KickKind = kickKind;
+            SpinDirection = spinDirection;
         }
 
         public int Sequence { get; }
@@ -71,6 +72,7 @@ namespace BFC.FormationPlaytestLab
         public string LastContactPieceId { get; }
         public TacticalActionEnd Outcome { get; }
         public LabKickKind KickKind { get; }
+        public int SpinDirection { get; }
 
         public float NetForwardProgress =>
             (BallEnd.x - BallStart.x) * (ActingTeam == TeamId.TeamA ? 1f : -1f);
@@ -107,6 +109,7 @@ namespace BFC.FormationPlaytestLab
         private TeamId _lastContactTeam;
         private string _lastContactPiece;
         private LabKickKind _kickKind;
+        private int _spinDirection;
 
         public TacticalActionTelemetry(FieldDefinition field)
         {
@@ -118,7 +121,8 @@ namespace BFC.FormationPlaytestLab
         public TacticalActionRecord LastRecord => _records.Count == 0 ? null : _records[_records.Count - 1];
 
         public void Begin(TeamId team, string pieceId, float normalizedPower,
-            Vector3 ballPosition, LabKickKind kickKind = LabKickKind.Shot)
+            Vector3 ballPosition, LabKickKind kickKind = LabKickKind.Shot,
+            int spinDirection = 0)
         {
             if (_active) throw new InvalidOperationException("An action is already being recorded.");
             if (team != TeamId.TeamA && team != TeamId.TeamB)
@@ -131,9 +135,12 @@ namespace BFC.FormationPlaytestLab
             EnsureFinite(ballPosition, nameof(ballPosition));
             if (!Enum.IsDefined(typeof(LabKickKind), kickKind))
                 throw new ArgumentOutOfRangeException(nameof(kickKind));
+            if (spinDirection < -1 || spinDirection > 1)
+                throw new ArgumentOutOfRangeException(nameof(spinDirection));
 
             _team = team;
             _kickKind = kickKind;
+            _spinDirection = spinDirection;
             _pieceId = pieceId;
             _power = normalizedPower;
             _start = ballPosition;
@@ -197,7 +204,7 @@ namespace BFC.FormationPlaytestLab
                 _team, _pieceId, _power, _start, finalBallPosition,
                 _path, _maximumForward, _maximumDisplacement, _contacts,
                 _friendlyContacts, _opponentContacts, _uniqueContacts.Count,
-                _lastContactTeam, _lastContactPiece, outcome, _kickKind);
+                _lastContactTeam, _lastContactPiece, outcome, _kickKind, _spinDirection);
             if (_records.Count == MaxStoredRecords) _records.RemoveAt(0);
             _records.Add(record);
             _active = false;
@@ -214,7 +221,7 @@ namespace BFC.FormationPlaytestLab
         public string ToCsv()
         {
             var builder = new StringBuilder();
-            builder.AppendLine("sequence,field_id,field_length,field_width,team,piece,power,start_x,start_z,end_x,end_z,ball_path,maximum_displacement,max_forward_progress,net_forward_progress,path_field_ratio,contacts,friendly_contacts,opponent_contacts,unique_contacted_pieces,last_contact_team,last_contact_piece,outcome,kick_kind");
+            builder.AppendLine("sequence,field_id,field_length,field_width,team,piece,power,start_x,start_z,end_x,end_z,ball_path,maximum_displacement,max_forward_progress,net_forward_progress,path_field_ratio,contacts,friendly_contacts,opponent_contacts,unique_contacted_pieces,last_contact_team,last_contact_piece,outcome,kick_kind,spin_direction");
             foreach (TacticalActionRecord item in _records)
             {
                 builder.Append(item.Sequence).Append(',')
@@ -240,7 +247,8 @@ namespace BFC.FormationPlaytestLab
                     .Append(item.LastContactTeam).Append(',')
                     .Append(Csv(item.LastContactPieceId)).Append(',')
                     .Append(item.Outcome).Append(',')
-                    .Append(item.KickKind)
+                    .Append(item.KickKind).Append(',')
+                    .Append(item.SpinDirection)
                     .AppendLine();
             }
 

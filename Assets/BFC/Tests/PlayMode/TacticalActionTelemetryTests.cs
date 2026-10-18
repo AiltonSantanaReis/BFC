@@ -34,6 +34,7 @@ namespace BFC.Tests.PlayMode
             Assert.That(record.UniqueContactedPieces, Is.EqualTo(2));
             Assert.That(record.LastContactTeam, Is.EqualTo(TeamId.TeamB));
             Assert.That(record.KickKind, Is.EqualTo(LabKickKind.Shot));
+            Assert.That(record.SpinDirection, Is.Zero);
             Assert.That(record.LastContactPieceId, Is.EqualTo("F2"));
             Assert.That(record.PathToFieldLengthRatio, Is.EqualTo(7f / 42f).Within(0.0001f));
 
@@ -56,14 +57,15 @@ namespace BFC.Tests.PlayMode
             Assert.That(telemetry.Records.Count, Is.Zero);
 
             telemetry.Begin(TeamId.TeamB, "P,\"7", 0.25f, Vector3.zero,
-                LabKickKind.ControlledPass);
+                LabKickKind.ControlledPass, +1);
             telemetry.ObserveBallPosition(new Vector3(-2.5f, 0f, 0f));
             telemetry.Complete(TacticalActionEnd.Goal, new Vector3(-2.5f, 0f, 0f));
             string csv = telemetry.ToCsv();
             Assert.That(csv, Does.Contain("\"P,\"\"7\""));
             Assert.That(csv, Does.Contain("2.5"));
             Assert.That(csv, Does.Contain("Goal,ControlledPass"));
-            Assert.That(csv, Does.Contain("kick_kind"));
+            Assert.That(csv, Does.Contain("kick_kind,spin_direction"));
+            Assert.That(csv, Does.Contain("ControlledPass,1"));
             Assert.That(telemetry.Records.Count, Is.EqualTo(1));
             Assert.That(telemetry.LastRecord.Sequence, Is.EqualTo(1));
         }

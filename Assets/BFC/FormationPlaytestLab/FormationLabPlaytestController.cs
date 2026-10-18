@@ -45,6 +45,8 @@ namespace BFC.FormationPlaytestLab
         private LabTacticalLaneOverlay _laneOverlay;
         private LabKickKind _kickKind = LabKickKind.Shot;
         private LabCinematicActionCamera _actionCamera;
+        private LabBallSpinController _spin;
+        private int _selectedSpinDirection;
         private bool _opponentAIEnabled;
         private bool _aiDelayInitialized;
         private float _aiCooldownSeconds;
@@ -77,6 +79,7 @@ namespace BFC.FormationPlaytestLab
 
             _actionCamera = gameObject.AddComponent<LabCinematicActionCamera>();
             _actionCamera.Initialize(camera, _ball.transform, field);
+            _spin = _ball.gameObject.AddComponent<LabBallSpinController>();
             _telemetry = new TacticalActionTelemetry(field);
             _laneOverlay = gameObject.AddComponent<LabTacticalLaneOverlay>();
             _laneOverlay.Initialize(_ball.transform,
@@ -85,7 +88,7 @@ namespace BFC.FormationPlaytestLab
                 _ball.GetComponent<FormationLabBallContactObserver>();
             if (observer == null)
                 observer = _ball.gameObject.AddComponent<FormationLabBallContactObserver>();
-            observer.Initialize(_telemetry);
+            observer.Initialize(_telemetry, _spin);
 
             _bodies = fixtures.GetComponentsInChildren<PlanarKineticBody>();
             _startPositions = new Vector3[_bodies.Length];
@@ -142,6 +145,13 @@ namespace BFC.FormationPlaytestLab
 
             if (keyboard != null && keyboard.iKey.wasPressedThisFrame)
                 TrySetOpponentAI(!_opponentAIEnabled);
+
+            if (keyboard != null && keyboard.qKey.wasPressedThisFrame)
+                TrySetSpinDirection(-1);
+            if (keyboard != null && keyboard.eKey.wasPressedThisFrame)
+                TrySetSpinDirection(+1);
+            if (keyboard != null && keyboard.xKey.wasPressedThisFrame)
+                TrySetSpinDirection(0);
 
             _laneOverlay.Refresh(
                 _match.State.Phase == MatchPhase.AwaitingAction && !_ballOutOfBounds
@@ -247,6 +257,7 @@ namespace BFC.FormationPlaytestLab
                     continue;
 
                 TrySetKickKind(plan.Kind);
+                TrySetSpinDirection(0); // AI uses same neutral default as the player.
                 bool launched = TryLaunch(piece,
                     new Vector3(plan.Direction.x, 0f, plan.Direction.y), plan.Power);
                 if (launched)
@@ -255,6 +266,18 @@ namespace BFC.FormationPlaytestLab
                               "Experimental heuristic, no rules changed.");
                 break;
             }
+        }
+
+        /// <summary>Manual spin intent; only legal before a physical action begins.</summary>
+        public bool TrySetSpinDirection(int direction)
+        {
+            if (direction < -1 || direction > 1 || _match == null ||
+                _shotInProgress || _ballOutOfBounds ||
+                _match.State.Phase != MatchPhase.AwaitingAction)
+                return false;
+
+            _selectedSpinDirection = direction;
+            return true;
         }
 
         /// <summary>
@@ -307,7 +330,8 @@ namespace BFC.FormationPlaytestLab
             _shotInProgress = true;
             _restDuration = 0f;
             _telemetry.Begin(piece.Team, piece.SlotId, Mathf.Clamp01(power),
-                _previousBallPosition, _kickKind);
+                _previousBallPosition, _kickKind, _selectedSpinDirection);
+            _spin.Arm(piece.Team, piece.SlotId, _selectedSpinDirection);
             _actionCamera.BeginAction(piece.Team);
             float launchLimit = LabKickProfile.ResolveMaximumSpeed(
                 _kickKind, PhysicsLabTuning.MaxLaunchSpeed);
@@ -330,6 +354,7 @@ namespace BFC.FormationPlaytestLab
             {
                 _lastScoringTeam = scorer;
                 _telemetry.Complete(TacticalActionEnd.Goal, currentPosition);
+                _spin.Clear();
                 _actionCamera.FinishAction(wasGoal: true);
                 StopAllBodies();
                 _shotInProgress = false;
@@ -355,6 +380,7 @@ namespace BFC.FormationPlaytestLab
             }
 
             _shotInProgress = false;
+            _spin.Clear();
             _actionCamera.FinishAction(wasGoal: false);
             TacticalActionRecord record = _telemetry.Complete(
                 _ballOutOfBounds ? TacticalActionEnd.OutOfBounds : TacticalActionEnd.Settled,
@@ -443,6 +469,7 @@ namespace BFC.FormationPlaytestLab
         private void RestorePositions()
         {
             _telemetry?.CancelActive();
+            _spin?.Clear();
             _actionCamera?.RestoreTacticalImmediately();
             StopAllBodies();
             for (int i = 0; i < _bodies.Length; i++)
@@ -469,6 +496,7 @@ namespace BFC.FormationPlaytestLab
             _match.StartMatch(TeamId.TeamA);
             _lastScoringTeam = TeamId.None;
             _kickKind = LabKickKind.Shot;
+            _selectedSpinDirection = 0;
             _aiDelayInitialized = false;
         }
 
@@ -545,7 +573,8 @@ namespace BFC.FormationPlaytestLab
                 $"P: {_kickKind} | T: corredores ({_laneOverlay.VisibleLaneCount}/" +
                 $"{_laneOverlay.GeometricallyClearLaneCount} livres) | " +
                 $"V: camera {(_actionCamera.CinematicEnabled ? "cinematica" : "tatica")} | " +
-                $"I: {(_opponentAIEnabled ? "P1 vs COM" : "P1 vs P2")}");
+                $"I: {(_opponentAIEnabled ? "P1 vs COM" : "P1 vs P2")} | " +
+                $"Q/E/X: spin={_selectedSpinDirection}");
         }
 
         private void OnDestroy()

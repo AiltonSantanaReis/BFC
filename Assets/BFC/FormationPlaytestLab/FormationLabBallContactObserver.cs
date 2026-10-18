@@ -11,10 +11,12 @@ namespace BFC.FormationPlaytestLab
     public sealed class FormationLabBallContactObserver : MonoBehaviour
     {
         private TacticalActionTelemetry _telemetry;
+        private LabBallSpinController _spin;
 
-        public void Initialize(TacticalActionTelemetry telemetry)
+        public void Initialize(TacticalActionTelemetry telemetry, LabBallSpinController spin)
         {
             _telemetry = telemetry;
+            _spin = spin;
         }
 
         private void OnCollisionEnter(Collision collision)
@@ -25,7 +27,10 @@ namespace BFC.FormationPlaytestLab
             FormationPieceRuntime piece =
                 collision.collider.GetComponentInParent<FormationPieceRuntime>();
             if (piece != null)
+            {
                 _telemetry.ObserveBallContact(piece.Team, piece.SlotId);
+                _spin?.OnPieceContact(piece);
+            }
         }
     }
 }
