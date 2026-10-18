@@ -11,7 +11,9 @@ namespace BFC.FormationLab
         private const string FieldProfileArgumentPrefix = "-bfcFieldProfile=";
 
         [SerializeField] private FormationLabFieldProfile defaultFieldProfile = FormationLabFieldProfile.Original;
-        [SerializeField] private bool enablePlayablePrototype;
+
+        public FormationLabFieldProfile ActiveProfile { get; private set; }
+        public Transform GeneratedFixtures { get; private set; }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void AttachWhenFormationLabLoads()
@@ -32,36 +34,14 @@ namespace BFC.FormationLab
 
         private void Awake()
         {
-            FormationLabFieldProfile profile = ResolveFieldProfile();
-            Transform fixtures = FormationLabRuntimeBuilder.Build(transform, profile);
-
-            if (enablePlayablePrototype || HasArgument("-bfcPlayableLab"))
-            {
-                var playtest = gameObject.AddComponent<FormationLabPlaytestController>();
-                playtest.Initialize(
-                    fixtures,
-                    FormationLabPreviewProfiles.CreateFieldPreview(profile),
-                    Camera.main);
-            }
+            ActiveProfile = ResolveFieldProfile();
+            GeneratedFixtures = FormationLabRuntimeBuilder.Build(transform, ActiveProfile);
 
             if (FormationLabPerformanceProbe.IsRequested() &&
                 GetComponent<FormationLabPerformanceProbe>() == null)
             {
                 gameObject.AddComponent<FormationLabPerformanceProbe>();
             }
-        }
-
-        private static bool HasArgument(string argument)
-        {
-            string[] args = Environment.GetCommandLineArgs();
-            for (int i = 0; i < args.Length; i++)
-            {
-                if (string.Equals(args[i], argument, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-            return false;
         }
 
         private FormationLabFieldProfile ResolveFieldProfile()

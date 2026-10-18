@@ -1,0 +1,16 @@
+{
+  "name": "BFC.FormationPlaytestLab",
+  "rootNamespace": "BFC.FormationPlaytestLab",
+  "references": [
+    "BFC.Core",
+    "BFC.FormationLab",
+    "BFC.Gameplay",
+    "BFC.Physics",
+    "Unity.InputSystem"
+  ],
+  "autoReferenced": false,
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "noEngineReferences": false
+}

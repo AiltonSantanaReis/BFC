@@ -3,7 +3,7 @@ using BFC.Core.Fields;
 using BFC.Core.Matches;
 using UnityEngine;
 
-namespace BFC.FormationLab
+namespace BFC.FormationPlaytestLab
 {
     /// <summary>
     /// Laboratory-only, swept whole-ball goal-line test. This is not an

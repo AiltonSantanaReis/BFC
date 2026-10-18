@@ -8,7 +8,7 @@ using BFC.Physics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace BFC.FormationLab
+namespace BFC.FormationPlaytestLab
 {
     /// <summary>
     /// Opt-in, two-player hot-seat integration experiment: input -> match authorization ->
@@ -143,7 +143,10 @@ namespace BFC.FormationLab
                 piece.Role != PieceRole.Outfield ||
                 piece.Team != _match.State.Possession ||
                 float.IsNaN(power) || float.IsInfinity(power) ||
-                power < MinPower || direction.sqrMagnitude < 0.000001f ||
+                power < MinPower ||
+                float.IsNaN(direction.x) || float.IsNaN(direction.z) ||
+                float.IsInfinity(direction.x) || float.IsInfinity(direction.z) ||
+                (direction.x * direction.x + direction.z * direction.z) < 0.000001f ||
                 !AllBodiesAtRest())
             {
                 return false;
@@ -337,7 +340,7 @@ namespace BFC.FormationLab
                     : state.Phase == MatchPhase.ResolvingAction
                         ? "Aguardando a bola e as pecas pararem..."
                         : $"Vez: {state.Possession} | Acoes: {state.ActionsUsedInPossession}/{ExperimentalActionsPerPossession}";
-            GUI.Box(new Rect(12f, 12f, Mathf.Min(515f, Screen.width - 24f), 114f),
+            GUI.Box(new Rect(12f, 12f, Mathf.Max(240f, Mathf.Min(515f, Screen.width - 24f)), 114f),
                 "BFC | PENDENTE DE VALIDACAO (Unity / Codex)\n" +
                 $"Equipe A {state.Score.TeamA} x {state.Score.TeamB} Equipe B\n" +
                 status + "\n" +

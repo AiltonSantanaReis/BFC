@@ -4,6 +4,7 @@ using BFC.Core.Fields;
 using BFC.Core.Formations;
 using BFC.Core.Matches;
 using BFC.FormationLab;
+using BFC.FormationPlaytestLab;
 using BFC.Gameplay.Matches;
 using NUnit.Framework;
 using UnityEngine;
@@ -60,6 +61,7 @@ namespace BFC.Tests.PlayMode
             Assert.That(playtest.TryLaunch(teamB, Vector3.right, 0.5f), Is.False);
             Assert.That(playtest.TryLaunch(goalkeeper, Vector3.right, 0.5f), Is.False);
             Assert.That(playtest.TryLaunch(teamA, Vector3.right, 0f), Is.False);
+            Assert.That(playtest.TryLaunch(teamA, Vector3.up, 0.5f), Is.False);
             Assert.That(playtest.TryLaunch(teamA, Vector3.right, 0.5f), Is.True);
             Assert.That(playtest.State.Phase, Is.EqualTo(MatchPhase.ResolvingAction));
             Assert.That(playtest.TryLaunch(teamA, Vector3.right, 0.5f), Is.False);

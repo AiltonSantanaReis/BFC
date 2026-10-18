@@ -6,7 +6,8 @@
     "BFC.Core",
     "BFC.FormationLab",
     "BFC.Physics",
-    "BFC.Gameplay"
+    "BFC.Gameplay",
+    "BFC.FormationPlaytestLab"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

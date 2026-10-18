@@ -14,9 +14,10 @@ Este PR depende de `experiments/field-scale-lab` (PR #13). Testar a branch
 ## Ativacao
 
 - Unity Editor 6000.3.21f1, cena `Assets/BFC/Scenes/FormationLab.unity`.
-- No GameObject com `FormationLabRuntimeBootstrap`, marcar
-  `Enable Playable Prototype` no Inspector (usar perfil Tactical para o
-  primeiro teste).
+- No Editor, anexar `FormationLabPlaytestRuntimeBootstrap` a um GameObject
+  na cena FormationLab antes de entrar em Play Mode. O bootstrap normal de
+  formacoes continua separado do codigo de entrada (usar perfil Tactical
+  para o primeiro teste).
 - Alternativa: abrir o processo do Unity Editor com os argumentos
   `-bfcPlayableLab -bfcFieldProfile=Tactical`, entao rodar FormationLab.
 - Clique numa peca de linha da equipe da vez; arraste na direcao oposta ao
@@ -88,3 +89,10 @@ Qualquer correcao deve ser entregue em novo commit no PR draft.
 ```
 
 A validacao de Unity e hardware nao foi executada por este agente.
+
+### Arquitetura preservada
+
+O modulo `BFC.FormationPlaytestLab` depende de `BFC.FormationLab`,
+`BFC.Gameplay`, `BFC.Physics`, `BFC.Core` e `Unity.InputSystem`.
+O laboratorio base `BFC.FormationLab` nao importa o Input System nem
+`BFC.Gameplay`; isso preserva a regra do validador estrutural.
