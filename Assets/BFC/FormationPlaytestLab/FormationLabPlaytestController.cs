@@ -48,6 +48,8 @@ namespace BFC.FormationPlaytestLab
         private LabBallSpinController _spin;
         private LabBallChipFlight _chip;
         private int _selectedSpinDirection;
+        private LabGoalkeeperShotExercise _keeperExercise;
+        private bool _declaredShotPending;
         private bool _opponentAIEnabled;
         private bool _aiDelayInitialized;
         private float _aiCooldownSeconds;
@@ -70,6 +72,7 @@ namespace BFC.FormationPlaytestLab
             _fixtures = fixtures;
             _field = field;
             _camera = camera;
+            _keeperExercise = new LabGoalkeeperShotExercise(field, fixtures);
 
             Transform ballTransform = fixtures.Find(FormationLabRuntimeBuilder.BallName);
             if (ballTransform == null ||
@@ -151,6 +154,15 @@ namespace BFC.FormationPlaytestLab
             if (keyboard != null && keyboard.hKey.wasPressedThisFrame)
                 TrySetKickKind(LabKickKind.Chip);
 
+            // Hot-seat goalkeeper exercise only: K announces the upcoming
+            // regular shot; defender has a timed, bounded positioning window.
+            _keeperExercise.Advance(Time.unscaledDeltaTime);
+            if (keyboard != null && keyboard.kKey.wasPressedThisFrame)
+                TryAnnounceShot();
+            if (keyboard != null && keyboard.enterKey.wasPressedThisFrame &&
+                _keeperExercise.HasActiveWindow)
+                TryConfirmGoalkeeper(_keeperExercise.AuthorizedTeam);
+
             if (keyboard != null && keyboard.qKey.wasPressedThisFrame)
                 TrySetSpinDirection(-1);
             if (keyboard != null && keyboard.eKey.wasPressedThisFrame)
@@ -173,6 +185,23 @@ namespace BFC.FormationPlaytestLab
             TickOpponentAI();
 
             Mouse mouse = Mouse.current;
+            if (_keeperExercise.HasActiveWindow)
+            {
+                if (mouse != null && mouse.leftButton.wasPressedThisFrame)
+                {
+                    Ray ray = _camera.ScreenPointToRay(mouse.position.ReadValue());
+                    Plane tabletop = new Plane(Vector3.up,
+                        Vector3.up * (PhysicsLabTuning.PieceHeight * 0.5f));
+                    if (tabletop.Raycast(ray, out float hitDistance))
+                    {
+                        Vector3 proposed = ray.GetPoint(hitDistance);
+                        TryProposeGoalkeeper(_keeperExercise.AuthorizedTeam,
+                            proposed.x, proposed.z);
+                    }
+                }
+                return;
+            }
+
             if (mouse == null || _camera == null || _ballOutOfBounds)
             {
                 return;
@@ -198,10 +227,47 @@ namespace BFC.FormationPlaytestLab
             }
         }
 
+        /// <summary>
+        /// K announces an experimental *regular* shot in hot-seat play only.
+        /// This is not a Classic or competitive ruleset and grants no unlimited
+        /// goalkeeper movement. The defender chooses a legal position and commits.
+        /// </summary>
+        public bool TryAnnounceShot()
+        {
+            if (_match == null || _opponentAIEnabled || _shotInProgress ||
+                _ballOutOfBounds || _declaredShotPending ||
+                _match.State.Phase != MatchPhase.AwaitingAction ||
+                !_actionCamera.IsTacticalViewReady || !AllBodiesAtRest())
+                return false;
+
+            if (!_keeperExercise.TryBegin(_match.State.Possession, true))
+                return false;
+            ClearSelection();
+            _kickKind = LabKickKind.Shot;
+            _declaredShotPending = true;
+            return true;
+        }
+
+        public bool TryProposeGoalkeeper(TeamId defendingTeam, float x, float z)
+        {
+            return _keeperExercise != null &&
+                _keeperExercise.TryPropose(defendingTeam, x, z);
+        }
+
+        public bool TryConfirmGoalkeeper(TeamId defendingTeam)
+        {
+            return _keeperExercise != null &&
+                _keeperExercise.TryConfirm(defendingTeam);
+        }
+
+        public bool IsGoalkeeperWindowOpen =>
+            _keeperExercise != null && _keeperExercise.HasActiveWindow;
+
         /// <summary>Opt-in P1 vs COM laboratory. Team B is CPU controlled only when enabled.</summary>
         public bool TrySetOpponentAI(bool enabled)
         {
             if (_match == null || _shotInProgress || _ballOutOfBounds ||
+                _declaredShotPending || _keeperExercise.HasActiveWindow ||
                 _match.State.Phase != MatchPhase.AwaitingAction)
                 return false;
 
@@ -277,6 +343,7 @@ namespace BFC.FormationPlaytestLab
         public bool TrySetSpinDirection(int direction)
         {
             if (direction < -1 || direction > 1 || _match == null ||
+                _keeperExercise.HasActiveWindow ||
                 _shotInProgress || _ballOutOfBounds ||
                 _match.State.Phase != MatchPhase.AwaitingAction)
                 return false;
@@ -292,6 +359,8 @@ namespace BFC.FormationPlaytestLab
         public bool TrySetKickKind(LabKickKind kind)
         {
             if (_match == null || _shotInProgress || _ballOutOfBounds ||
+                _keeperExercise.HasActiveWindow ||
+                (_declaredShotPending && kind != LabKickKind.Shot) ||
                 _match.State.Phase != MatchPhase.AwaitingAction ||
                 !Enum.IsDefined(typeof(LabKickKind), kind))
                 return false;
@@ -303,6 +372,8 @@ namespace BFC.FormationPlaytestLab
         public bool TryLaunch(FormationPieceRuntime piece, Vector3 direction, float power)
         {
             if (_match == null || _shotInProgress || _ballOutOfBounds ||
+                _keeperExercise.HasActiveWindow ||
+                (_declaredShotPending && _kickKind != LabKickKind.Shot) ||
                 _match.State.Phase != MatchPhase.AwaitingAction ||
                 !_actionCamera.IsTacticalViewReady ||
                 piece == null || !piece.transform.IsChildOf(_fixtures) ||
@@ -332,6 +403,7 @@ namespace BFC.FormationPlaytestLab
             }
 
             _previousBallPosition = _ball.transform.position;
+            _declaredShotPending = false;
             _shotInProgress = true;
             _restDuration = 0f;
             _telemetry.Begin(piece.Team, piece.SlotId, Mathf.Clamp01(power),
@@ -414,6 +486,7 @@ namespace BFC.FormationPlaytestLab
         {
             ClearSelection();
             if (_match.State.Phase != MatchPhase.AwaitingAction ||
+                _keeperExercise.HasActiveWindow ||
                 _shotInProgress || !_actionCamera.IsTacticalViewReady ||
                 (_opponentAIEnabled && _match.State.Possession == TeamId.TeamB) ||
                 !AllBodiesAtRest())
@@ -479,6 +552,8 @@ namespace BFC.FormationPlaytestLab
 
         private void RestorePositions()
         {
+            _keeperExercise?.Cancel();
+            _declaredShotPending = false;
             _telemetry?.CancelActive();
             _spin?.Clear();
             _chip?.Clear();
@@ -586,7 +661,18 @@ namespace BFC.FormationPlaytestLab
                 $"{_laneOverlay.GeometricallyClearLaneCount} livres) | " +
                 $"V: camera {(_actionCamera.CinematicEnabled ? "cinematica" : "tatica")} | " +
                 $"I: {(_opponentAIEnabled ? "P1 vs COM" : "P1 vs P2")} | " +
-                $"Q/E/X: spin={_selectedSpinDirection} | H: Chip");
+                $"Q/E/X: spin={_selectedSpinDirection} | H: Chip | K: anunciar chute");
+            if (_keeperExercise != null && _keeperExercise.HasActiveWindow)
+            {
+                string candidate = _keeperExercise.HasCandidate
+                    ? $"Proposta X={_keeperExercise.CandidateX:F1}, Z={_keeperExercise.CandidateZ:F1}"
+                    : "Clique numa posicao valida na area do goleiro.";
+                GUI.Box(new Rect(12f, 206f,
+                        Mathf.Max(240f, Mathf.Min(515f, Screen.width - 24f)), 72f),
+                    $"GOLEIRO - EXERCICIO, NAO REGRA OFICIAL - " +
+                    $"time {_keeperExercise.AuthorizedTeam}, {_keeperExercise.RemainingSeconds:F1}s\n" +
+                    candidate + "\nEnter: confirmar | R: cancelar");
+            }
         }
 
         private void OnDestroy()
