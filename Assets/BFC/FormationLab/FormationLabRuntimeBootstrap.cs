@@ -28,7 +28,7 @@ namespace BFC.FormationLab
                 return;
             }
 
-            if (Object.FindFirstObjectByType<FormationLabRuntimeBootstrap>() != null)
+            if (UnityEngine.Object.FindFirstObjectByType<FormationLabRuntimeBootstrap>() != null)
             {
                 return;
             }

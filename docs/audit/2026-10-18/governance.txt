@@ -1,0 +1,2 @@
+Governance registry OK: 27 rules, 27 unique IDs.
+BASE_SHA not set; protected-file diff check skipped.

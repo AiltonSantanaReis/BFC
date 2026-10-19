@@ -38,6 +38,11 @@ namespace BFC.Tests.PlayMode
             Assert.That(keeper.transform.position, Is.EqualTo(original));
             Assert.That(exercise.TryConfirm(TeamId.TeamA), Is.False);
             Assert.That(exercise.TryConfirm(TeamId.TeamB), Is.True);
+            Assert.That(keeper.GetComponent<Rigidbody>().position.x,
+                Is.EqualTo(20f).Within(.001f), "The physics position must match the committed placement.");
+            // Rigidbody.position publishes its Transform on the next physics step.
+            yield return new WaitForFixedUpdate();
+            yield return null;
             Assert.That(keeper.transform.position.x, Is.EqualTo(20f).Within(.001f));
             Assert.That(exercise.TryPropose(TeamId.TeamB, 19f, 0f), Is.False);
 

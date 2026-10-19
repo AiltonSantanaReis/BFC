@@ -5,6 +5,7 @@ using BFC.Core.Fields;
 using BFC.Core.Formations;
 using BFC.Core.Matches;
 using BFC.Core.Rules;
+using BFC.FormationLab;
 using BFC.Gameplay.Matches;
 using BFC.Physics;
 using UnityEngine;

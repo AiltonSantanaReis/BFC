@@ -1,6 +1,7 @@
 using System;
 using BFC.Core.Fields;
 using BFC.Core.Matches;
+using BFC.FormationLab;
 using UnityEngine;
 
 namespace BFC.FormationPlaytestLab

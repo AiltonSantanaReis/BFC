@@ -65,6 +65,11 @@ namespace BFC.Tests.PlayMode
             Assert.That(playtest.TryConfirmGoalkeeper(TeamId.TeamA), Is.False);
             Assert.That(playtest.TryConfirmGoalkeeper(TeamId.TeamB), Is.True);
             Assert.That(playtest.IsGoalkeeperWindowOpen, Is.False);
+            Assert.That(goalkeeper.GetComponent<Rigidbody>().position.x,
+                Is.EqualTo(20f).Within(.001f), "The committed placement must update the physics body immediately.");
+            // Interpolated presentation follows the committed body on the next physics step.
+            yield return new WaitForFixedUpdate();
+            yield return null;
             Assert.That(goalkeeper.transform.position.x, Is.EqualTo(20f).Within(.001f));
             Assert.That(playtest.TryLaunch(shooter, Vector3.right, 0.5f), Is.True);
 
